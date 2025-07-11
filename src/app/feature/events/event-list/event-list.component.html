@@ -56,6 +56,11 @@
     <button (click)="loadMore()" [disabled]="isLoading">Carica altri eventi</button>
   </div>
 
+  <!-- Pulsante Nascondi eventi -->
+  <div *ngIf="showHideButton" style="text-align:center; margin-top: 1rem;">
+    <button (click)="hideExtraEvents()">🔼 Nascondi eventi</button>
+  </div>
+
 
   <!-- Crea evento (solo organizer) -->
   <div style="margin-top: 1rem;">

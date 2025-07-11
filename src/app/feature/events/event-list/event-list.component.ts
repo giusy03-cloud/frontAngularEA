@@ -27,6 +27,7 @@ export class EventListComponent implements OnInit {
   totalElements = 0;
 
   isOrganizer = false;
+  showHideButton=false;
 
   // Flag per capire se siamo in ricerca per nome o location, o lista completa
   currentSearchType: 'NONE' | 'NAME' | 'LOCATION' = 'NONE';
@@ -57,21 +58,19 @@ export class EventListComponent implements OnInit {
 
     this.isLoading = true;
     console.log(`Caricamento eventi, pagina: ${this.page}, size: ${this.size}`);
-
     if (this.currentSearchType === 'NAME' && this.searchName.trim()) {
-
-      this.eventsService.getEventsPaged(this.page, this.size).subscribe({
+      this.eventsService.searchByNamePaged(this.searchName.trim(), this.page, this.size).subscribe({
         next: (response) => {
-          console.log('Ricevuto risposta iniziale:', response);
           this.handlePagedResponse(response, reset);
         },
         error: (err) => {
-          console.error('Errore caricamento eventi:', err);
+          console.error('Errore nella ricerca per nome:', err);
           this.isLoading = false;
         }
       });
+    }
 
-    } else if (this.currentSearchType === 'LOCATION' && this.searchLocation.trim()) {
+    else if (this.currentSearchType === 'LOCATION' && this.searchLocation.trim()) {
       this.eventsService.searchByLocationPaged(this.searchLocation.trim(), this.page, this.size).subscribe({
         next: (response) => {
           this.handlePagedResponse(response, reset);
@@ -100,7 +99,22 @@ export class EventListComponent implements OnInit {
     this.totalElements = response.totalElements;
     this.isLoading = false;
     console.log(`Eventi caricati totali: ${this.events.length} su ${this.totalElements}`);
+    this.showHideButton = this.events.length > this.size;
   }
+
+
+  hideExtraEvents(): void {
+    if (this.events.length > this.size) {
+      this.events.splice(-this.size); // Rimuove gli ultimi 10 eventi
+      this.page--; // Torna alla pagina precedente
+
+      if (this.events.length <= this.size) {
+        this.showHideButton = false;
+      }
+    }
+  }
+
+
 
   searchByName(): void {
     if (!this.searchName.trim()) {
