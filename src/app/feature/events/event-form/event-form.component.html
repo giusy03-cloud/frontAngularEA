@@ -1,0 +1,50 @@
+<form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+  <label>
+    Nome:
+    <input formControlName="name" />
+  </label>
+  <div *ngIf="eventForm.get('name')?.invalid && eventForm.get('name')?.touched">
+    Nome obbligatorio e max 255 caratteri
+  </div>
+
+  <label>
+    Descrizione:
+    <textarea formControlName="description"></textarea>
+  </label>
+
+  <label>
+    Data inizio:
+    <input type="datetime-local" formControlName="startDate" />
+  </label>
+
+  <label>
+    Data fine:
+    <input type="datetime-local" formControlName="endDate" />
+  </label>
+
+  <label>
+    Location:
+    <input formControlName="location" />
+  </label>
+
+  <label>
+    Prezzo:
+    <input type="number" formControlName="price" min="0" />
+  </label>
+
+  <label>
+    Capacità:
+    <input type="number" formControlName="capacity" min="1" />
+  </label>
+
+  <label>
+    Status:
+    <select formControlName="status">
+      <option value="ACTIVE">Active</option>
+      <option value="CANCELLED">Inactive</option>
+      <option value="COMPLETED">Cancelled</option>
+    </select>
+  </label>
+
+  <button type="submit">{{ isEdit ? 'Aggiorna' : 'Crea' }} Evento</button>
+</form>

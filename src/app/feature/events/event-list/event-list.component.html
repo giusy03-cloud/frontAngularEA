@@ -1,0 +1,64 @@
+<div>
+  <h2>Lista Eventi</h2>
+
+  <!-- Barra di ricerca -->
+  <div style="margin-bottom: 1rem;">
+    <input [(ngModel)]="searchName" placeholder="Cerca per nome" />
+    <button (click)="searchByName()">Cerca</button>
+
+    <input [(ngModel)]="searchLocation" placeholder="Cerca per location" />
+    <button (click)="searchByLocation()">Cerca</button>
+  </div>
+
+  <!-- Tabella eventi -->
+  <table *ngIf="events && events.length > 0" class="event-table">
+    <thead>
+    <tr>
+      <th>Nome</th>
+      <th>Descrizione</th>
+      <th>Luogo</th>
+      <th>Inizio</th>
+      <th>Fine</th>
+      <th>Prezzo</th>
+      <th>Capacità</th>
+      <th>Status</th>
+      <th>Azioni</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr *ngFor="let event of events">
+      <td>{{ event.name }}</td>
+      <td>{{ event.description }}</td>
+      <td>{{ event.location }}</td>
+      <td>{{ event.startDate | date:'short' }}</td>
+      <td>{{ event.endDate | date:'short' }}</td>
+      <td>{{ event.price || 0 | currency:'EUR' }}</td>
+      <td>{{ event.capacity }}</td>
+      <td>{{ event.status }}</td>
+      <td>
+        <button *ngIf="isOrganizer" (click)="deleteEvent(event.id!)">Elimina</button>
+        <button *ngIf="isOrganizer" [routerLink]="['/events/edit', event.id]">Modifica</button>
+        <button *ngIf="!isOrganizer" (click)="bookEvent(event.id!)">Prenota</button>
+      </td>
+    </tr>
+    </tbody>
+  </table>
+
+  <!-- Messaggio nessun evento -->
+  <div *ngIf="events?.length === 0 && !isLoading">Nessun evento trovato.</div>
+
+  <!-- Caricamento -->
+  <div *ngIf="isLoading">Caricamento eventi...</div>
+
+  <!-- Pulsante Carica altri -->
+
+  <div *ngIf="events && events.length > 0 && totalElements !== undefined && (page + 1) * size < totalElements">
+    <button (click)="loadMore()" [disabled]="isLoading">Carica altri eventi</button>
+  </div>
+
+
+  <!-- Crea evento (solo organizer) -->
+  <div style="margin-top: 1rem;">
+    <button *ngIf="isOrganizer" routerLink="/events/create">Crea Nuovo Evento</button>
+  </div>
+</div>

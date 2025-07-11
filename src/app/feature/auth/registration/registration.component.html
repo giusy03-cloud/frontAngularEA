@@ -1,0 +1,14 @@
+<form (ngSubmit)="register()">
+  <input [(ngModel)]="user.name" name="name" placeholder="Nome" required>
+  <input [(ngModel)]="user.username" name="username" placeholder="Username" required>
+  <input [(ngModel)]="user.password" name="password" type="password" placeholder="Password" required>
+  <select [(ngModel)]="user.role" name="role">
+    <option value="PARTICIPANT">Partecipante</option>
+    <option value="ORGANIZER">Organizzatore</option>
+  </select>
+
+  <input *ngIf="user.role === 'ORGANIZER'" [(ngModel)]="invitationCode" name="invitationCode" placeholder="PIN per organizzatore">
+
+  <button type="submit">Registrati</button>
+  <p *ngIf="error" style="color:red">{{ error }}</p>
+</form>
