@@ -9,7 +9,7 @@ import {AuthService} from '../services/auth.service';
   styleUrls: ['./header.component.css']
 })
 export class HeaderComponent {
-  constructor(public auth: AuthService, private router: Router) {}
+  constructor(public auth: AuthService, protected router: Router) {}
 
   goToLogin() {
     this.router.navigate(['/auth/login']);
@@ -37,4 +37,9 @@ export class HeaderComponent {
   get isAdmin(): boolean {
     return this.auth.isAdmin();
   }
+
+  get isOrganizer(): boolean {
+    return this.auth.getRole() === 'ORGANIZER';
+  }
+
 }

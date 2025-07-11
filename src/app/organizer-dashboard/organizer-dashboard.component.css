@@ -1,0 +1,16 @@
+.dashboard-container {
+  display: flex;
+  justify-content: center;
+  margin-top: 40px;
+}
+
+mat-card {
+  padding: 20px;
+  width: 300px;
+  text-align: center;
+}
+
+button {
+  margin: 10px 0;
+  width: 100%;
+}

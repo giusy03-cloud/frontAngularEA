@@ -6,6 +6,8 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { RouterModule } from '@angular/router';
+import {BookingService} from '../../../services/booking.service';
+import {Booking} from '../../../models/booking.model';
 
 @Component({
   selector: 'app-event-list',
@@ -32,6 +34,7 @@ export class EventListComponent implements OnInit {
   constructor(
     private eventsService: EventService,
     private authService: AuthService,
+    private bookingService: BookingService,
     private router: Router
   ) {}
 
@@ -141,9 +144,43 @@ export class EventListComponent implements OnInit {
     }
   }
 
-  bookEvent(id: number): void {
-    alert(`Funzione di prenotazione per evento ID ${id} non ancora implementata.`);
+
+
+  bookEvent(eventId: number): void {
+    const event = this.events.find(e => e.id === eventId);
+    if (!event) {
+      alert('Evento non trovato.');
+      return;
+    }
+
+    if (event.status === 'CANCELLED') {
+      alert('Non puoi prenotare un evento cancellato.');
+      return;
+    }
+
+    const userId = this.authService.getUserId();
+    if (!userId) {
+      alert('Devi essere loggato per prenotare un evento.');
+      return;
+    }
+
+    const booking: Booking = {
+      userId: userId,
+      eventId: eventId,
+      bookingTime: new Date().toISOString()
+    };
+
+    this.bookingService.createBooking(booking).subscribe({
+      next: () => {
+        alert('Prenotazione effettuata con successo!');
+      },
+      error: (err) => {
+        console.error('Errore durante la prenotazione:', err);
+        alert('Errore durante la prenotazione. Riprova più tardi.');
+      }
+    });
   }
+
 
   loadMore(): void {
     if ((this.page + 1) * this.size >= this.totalElements) {

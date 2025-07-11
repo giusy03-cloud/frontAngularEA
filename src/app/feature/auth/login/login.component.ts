@@ -24,14 +24,25 @@ export class LoginComponent {
 
 
 
+
   login() {
     this.authService.login(this.username, this.password).subscribe({
       next: () => {
-        this.router.navigate(['/events']);  // stessa pagina per tutti
+        const role = this.authService.getRole(); // Ottieni il ruolo dall'authService
+
+        if (role === 'ORGANIZER') {
+          this.router.navigate(['/organizer-dashboard']);
+        } else if (role === 'PARTICIPANT') {
+          this.router.navigate(['/events']); // pagina con lista eventi da prenotare
+        } else {
+          // fallback, se vuoi
+          this.router.navigate(['/home']);
+        }
       },
       error: err => this.error = 'Username o password errati'
     });
   }
+
 
 
 }

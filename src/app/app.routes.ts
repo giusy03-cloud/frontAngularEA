@@ -73,5 +73,12 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./feature/booking/booking.component').then(m => m.BookingComponent)
     // canActivate: [AuthGuard]
+  },
+  {
+    path: 'organizer-dashboard',
+    loadComponent: () =>
+      import('./organizer-dashboard/organizer-dashboard.component').then(m => m.OrganizerDashboardComponent)
+    // puoi aggiungere canActivate con guard se vuoi proteggere la rotta solo per organizer
   }
+
 ];

@@ -1,6 +1,6 @@
 export interface Booking {
-  id: number;          // UUID o stringa
-  userId: string;
-  eventId: string;
-  bookingTime: string;        // o Date/Time, secondo come salvi nel backend
+  id?: number;         // opzionale se può mancare
+  userId: number;
+  eventId: number;
+  bookingTime?: string;
 }

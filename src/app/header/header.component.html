@@ -1,7 +1,8 @@
-<!-- Mostra se loggato -->
-<button [hidden]="!isLoggedIn" (click)="goToProfile()">Profilo</button>
-<button [hidden]="!isAdmin" (click)="goToAdmin()">Admin</button>
-<button [hidden]="!isLoggedIn" (click)="logout()">Logout</button>
+<!-- Bottone per la dashboard organizer, visibile solo se isOrganizer -->
+<button *ngIf="isOrganizer" (click)="router.navigate(['/organizer'])">Dashboard Organizer</button>
 
-<!-- Mostra se NON loggato -->
-<button [hidden]="isLoggedIn" (click)="goToLogin()">Login</button>
+<!-- Già esistenti -->
+<button *ngIf="isLoggedIn" (click)="goToProfile()">Profilo</button>
+<button *ngIf="isAdmin" (click)="goToAdmin()">Admin</button>
+<button *ngIf="isLoggedIn" (click)="logout()">Logout</button>
+<button *ngIf="!isLoggedIn" (click)="goToLogin()">Login</button>
