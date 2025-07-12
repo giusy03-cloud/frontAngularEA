@@ -41,14 +41,19 @@ export class AuthService {
     return userJson ? JSON.parse(userJson) : null;
   }
 
+  /*
   isAuthenticated(): boolean {
     return !!this.getToken();
   }
+
+   */
+
 
   getRole(): string | null {
     const user = this.getCurrentUser();
     return user?.role || null;
   }
+
 
   // Dentro AuthService
   isAdmin(): boolean {
@@ -60,6 +65,17 @@ export class AuthService {
     const user = this.getCurrentUser();
     return user ? user.id : null;
   }
+
+  isAuthenticated(): boolean {
+    const token = this.getToken();
+    return token !== null && token !== undefined && token.trim() !== '';
+  }
+
+
+
+
+
+
 
 
 }

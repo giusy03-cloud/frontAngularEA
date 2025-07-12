@@ -15,17 +15,11 @@ export class HeaderComponent {
     this.router.navigate(['/auth/login']);
   }
 
-  goToProfile() {
-    this.router.navigate(['/profile']);
-  }
 
-  goToAdmin() {
-    this.router.navigate(['/admin']);
-  }
 
   logout() {
     this.auth.logout();
-    this.router.navigate(['/auth']);
+    this.router.navigate(['/auth/login']);
   }
 
   // Getter per sapere se l'utente è autenticato

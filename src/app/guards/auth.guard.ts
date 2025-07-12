@@ -11,7 +11,7 @@ export class AuthGuard implements CanActivate {
     const allowed = this.auth.isAuthenticated();
     console.log('AuthGuard canActivate:', allowed);
     if (!allowed) {
-      this.router.navigate(['/login']);
+      this.router.navigate(['/auth/login']);
     }
     return allowed;
   }

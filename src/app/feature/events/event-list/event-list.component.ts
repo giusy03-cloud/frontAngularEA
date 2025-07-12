@@ -49,6 +49,12 @@ export class EventListComponent implements OnInit {
     this.loadEvents(true);
   }
 
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/auth/login']);
+  }
+
+
 
   loadEvents(reset = true): void {
     if (reset) {

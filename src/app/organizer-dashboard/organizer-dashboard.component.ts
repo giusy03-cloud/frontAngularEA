@@ -22,4 +22,9 @@ export class OrganizerDashboardComponent {
   goToBookings() {
     this.router.navigate(['/bookings']);
   }
+
+  goToUsers() {
+    this.router.navigate(['/user-list']);
+  }
+
 }

@@ -1,4 +1,6 @@
 import { Routes } from '@angular/router';
+import {OrganizerGuard} from './guards/organizer.guard';
+import {AuthGuard} from './guards/auth.guard';
 
 export const routes: Routes = [
   {
@@ -32,14 +34,6 @@ export const routes: Routes = [
           import('./feature/events/event-form/event-form.component').then(m => m.EventFormComponent)
       }
     ]
-  }
-  ,
-
-  {
-    path: 'profile',
-    loadComponent: () =>
-      import('./feature/profile/profile.component').then(m => m.ProfileComponent)
-    // canActivate: [AuthGuard] (per ora rimosso)
   },
   {
     path: 'preferiti',
@@ -47,12 +41,7 @@ export const routes: Routes = [
       import('./feature/favorites/favorites.component').then(m => m.FavoritesComponent)
     // canActivate: [AuthGuard]
   },
-  {
-    path: 'admin',
-    loadComponent: () =>
-      import('./feature/admin/admin.component').then(m => m.AdminComponent)
-    // canActivate: [AdminGuard]
-  },
+
   {
     path: 'auth',
     children: [
@@ -68,17 +57,27 @@ export const routes: Routes = [
       }
     ]
   },
+
   {
     path: 'bookings',
     loadComponent: () =>
-      import('./feature/booking/booking.component').then(m => m.BookingComponent)
-    // canActivate: [AuthGuard]
+      import('./feature/booking/booking.component').then(m => m.BookingComponent),
+    canActivate: [AuthGuard,OrganizerGuard]   // <-- proteggi questa rotta
+  },
+
+  {
+    path: 'user-list',
+    loadComponent: () =>
+      import('./feature/user-list/user-list.component').then(m => m.UserListComponent),
+    canActivate: [OrganizerGuard]
   },
   {
     path: 'organizer-dashboard',
     loadComponent: () =>
-      import('./organizer-dashboard/organizer-dashboard.component').then(m => m.OrganizerDashboardComponent)
-    // puoi aggiungere canActivate con guard se vuoi proteggere la rotta solo per organizer
+      import('./organizer-dashboard/organizer-dashboard.component').then(m => m.OrganizerDashboardComponent),
+    canActivate: [OrganizerGuard]
   }
+
+
 
 ];
