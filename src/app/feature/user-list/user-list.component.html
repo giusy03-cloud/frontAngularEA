@@ -1,0 +1,32 @@
+<h2>Gestione Utenti Registrati</h2>
+
+<div *ngIf="isLoading">Caricamento utenti...</div>
+
+<table *ngIf="!isLoading && users.length > 0" border="1">
+  <thead>
+  <tr>
+    <th>ID</th>
+    <th>Nome</th>
+    <th>Username</th>
+    <th>Ruolo</th>
+    <th>Tipo Accesso</th>
+    <th>Azioni</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let user of users">
+    <td>{{ user.id }}</td>
+    <td>{{ user.name }}</td>
+    <td>{{ user.username }}</td>
+    <td>{{ user.role }}</td>
+    <td>{{ user.accessType }}</td>
+    <td>
+      <button (click)="deleteUser(user.id)">Elimina</button>
+    </td>
+  </tr>
+  </tbody>
+</table>
+
+<div *ngIf="!isLoading && users.length === 0">
+  Nessun utente registrato.
+</div>
