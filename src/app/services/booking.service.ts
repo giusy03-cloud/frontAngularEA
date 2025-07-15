@@ -23,4 +23,14 @@ export class BookingService {
     return this.http.get<Booking[]>(this.baseUrl, { headers });
   }
 
+  getBookingsByUser(userId: number): Observable<Booking[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<Booking[]>(`${this.baseUrl}/user/${userId}`, { headers });
+  }
+
+
+
+
+
 }

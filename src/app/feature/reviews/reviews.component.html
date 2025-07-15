@@ -1,1 +1,20 @@
-<p>reviews works!</p>
+<div class="reviews-section">
+  <h3>Recensioni</h3>
+  <div *ngFor="let r of reviews" class="review">
+    <strong>⭐ {{ r.rating }}</strong>
+    <p>{{ r.comment }}</p>
+  </div>
+
+  <div class="review-form">
+    <h4>Lascia una recensione</h4>
+    <label>Rating:
+      <select [(ngModel)]="newReview.rating">
+        <option *ngFor="let r of [1,2,3,4,5]" [value]="r">{{r}}</option>
+      </select>
+    </label>
+    <br />
+    <textarea [(ngModel)]="newReview.comment" placeholder="Scrivi il tuo commento"></textarea>
+    <br />
+    <button (click)="submitReview()">Invia</button>
+  </div>
+</div>

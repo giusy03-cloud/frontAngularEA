@@ -76,7 +76,9 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./organizer-dashboard/organizer-dashboard.component').then(m => m.OrganizerDashboardComponent),
     canActivate: [OrganizerGuard]
-  }
+  },
+
+
 
 
 
