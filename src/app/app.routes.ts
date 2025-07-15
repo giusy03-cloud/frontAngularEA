@@ -78,7 +78,12 @@ export const routes: Routes = [
     canActivate: [OrganizerGuard]
   },
 
-
+  {
+    path: 'reviews',
+    loadComponent: () =>
+      import('./feature/reviews/reviews.component').then(m => m.ReviewsComponent),
+    //canActivate: [AuthGuard] // opzionale, se vuoi solo utenti loggati
+  }
 
 
 
