@@ -1,7 +1,14 @@
-<!-- Bottone per la dashboard organizer, visibile solo se isOrganizer -->
-<button *ngIf="isOrganizer" (click)="router.navigate(['/organizer-dashboard'])">Dashboard Organizer</button>
+<header class="header">
+  <div class="logo">
+    <a routerLink="/" class="logo-text">TicketTwo</a>
+  </div>
 
-<!-- Già esistenti -->
+  <nav class="nav-links">
+    <a *ngIf="!authService.isAuthenticated()" routerLink="auth/login" class="nav-link">Login</a>
 
-<button *ngIf="isLoggedIn" (click)="logout()">Logout</button>
-<button *ngIf="!isLoggedIn" (click)="goToLogin()">Login</button>
+    <ng-container *ngIf="authService.isAuthenticated()">
+      <a routerLink="/profile" class="nav-link">Profilo</a>
+      <a (click)="logout()" class="nav-link">Logout</a>
+    </ng-container>
+  </nav>
+</header>

@@ -1,44 +1,36 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Review } from '../models/review.model';
 
-@Injectable({
-  providedIn: 'root'
-})
+
+export interface Review {
+  id?: number;
+  userId: number;
+  eventId: number;
+  rating: number;
+  comment: string;
+  timestamp?: string;
+}
+
+@Injectable({ providedIn: 'root' })
 export class ReviewService {
-
-  private apiUrl = 'http://localhost:8082/reviews';
+  private apiBase = 'http://localhost:8082/reviews';
 
   constructor(private http: HttpClient) {}
 
-  private getAuthHeaders(): HttpHeaders {
-    const token = localStorage.getItem('token'); // o dal tuo AuthService
-    return new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
-  }
-
-  createReview(review: Review): Observable<Review> {
-    return this.http.post<Review>(this.apiUrl, review, {
-      headers: this.getAuthHeaders()
-    });
-  }
-
   getReviewsByEvent(eventId: number): Observable<Review[]> {
-    return this.http.get<Review[]>(`${this.apiUrl}/event/${eventId}`);
+    return this.http.get<Review[]>(`${this.apiBase}/event/${eventId}`);
   }
 
-  deleteReview(id: number): Observable<any> {
-    return this.http.delete(`${this.apiUrl}/${id}`, {
-      headers: this.getAuthHeaders()
-    });
-  }
+  submitReview(review: Review): Observable<Review> {
+    const body = new HttpParams()
+      .set('userId', review.userId.toString())
+      .set('eventId', review.eventId.toString())
+      .set('rating', review.rating.toString())
+      .set('comment', review.comment);
 
-  updateReview(id: number, review: Review): Observable<Review> {
-    return this.http.put<Review>(`${this.apiUrl}/${id}`, review, {
-      headers: this.getAuthHeaders()
+    return this.http.post<Review>(`${this.apiBase}/form`, body.toString(), {
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
   }
 }

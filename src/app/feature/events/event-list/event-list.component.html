@@ -39,6 +39,7 @@
         <button *ngIf="isOrganizer" (click)="deleteEvent(event.id!)">Elimina</button>
         <button *ngIf="isOrganizer" [routerLink]="['/events/edit', event.id]">Modifica</button>
         <button *ngIf="!isOrganizer" (click)="bookEvent(event.id!)">Prenota</button>
+        <button (click)="goToDetails(event.id!)">Dettagli</button>
       </td>
     </tr>
     </tbody>

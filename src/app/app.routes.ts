@@ -1,13 +1,14 @@
 import { Routes } from '@angular/router';
 import {OrganizerGuard} from './guards/organizer.guard';
 import {AuthGuard} from './guards/auth.guard';
+import { HomeComponent } from './feature/home/home.component';
+
+
 
 export const routes: Routes = [
-  {
-    path: '',
-    redirectTo: 'home',
-    pathMatch: 'full'
-  },
+  {path: '', redirectTo: 'home', pathMatch: 'full'},
+  { path: '', component: HomeComponent },
+
   {
     path: 'home',
     loadComponent: () =>
@@ -32,6 +33,11 @@ export const routes: Routes = [
         path: 'edit/:id',
         loadComponent: () =>
           import('./feature/events/event-form/event-form.component').then(m => m.EventFormComponent)
+      },
+      {
+        path: ':id',
+        loadComponent: () =>
+          import('./feature/events/event-details/event-details.component').then(m => m.EventDetailsComponent)
       }
     ]
   },
@@ -62,7 +68,7 @@ export const routes: Routes = [
     path: 'bookings',
     loadComponent: () =>
       import('./feature/booking/booking.component').then(m => m.BookingComponent),
-    canActivate: [AuthGuard,OrganizerGuard]   // <-- proteggi questa rotta
+    canActivate: [AuthGuard,OrganizerGuard]
   },
 
   {

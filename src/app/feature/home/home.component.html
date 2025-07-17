@@ -1,16 +1,32 @@
-<h1>🏠 Home di Prova - Navigazione</h1>
+<div id="carousel-container">
+  <h2 class="carousel-title">Eventi in evidenza</h2>
 
-<div style="
-display: flex; flex-direction: column; gap: 10px; max-width: 300px; margin-top: 20px;">
-  <!--<button mat-button routerLink="/events">Lista Eventi</button>
-  <button mat-button routerLink="/events/1">Evento ID 1</button>
-  <button mat-button routerLink="/bookings">Prenotazioni</button>
-  <button mat-button routerLink="/bookings/1">Prenotazione ID 1</button>-->
-  <button mat-button routerLink="/auth/login">Login</button>
+  <button class="arrow left" (click)="prevSlide()" [disabled]="currentIndex === 0">‹</button>
 
+  <div class="carousel-wrapper">
+    <div
+      class="carousel-track"
+      [style.width.%]="events.length * (100 / maxVisible)"
+      [style.transform]="'translateX(-' + (currentIndex * (100 / maxVisible)) + '%)'"
+    >
+      <div
+        class="event-card"
+        *ngFor="let event of events"
+        [style.flex]="'0 0 ' + (100 / maxVisible) + '%'"
+      >
+        <div class="image-placeholder">
+          <!-- In futuro puoi usare <img [src]="event.imageUrl"> -->
+          <div class="placeholder-icon">📅</div>
+        </div>
+        <div class="event-info">
+          <h3>{{ event.name }}</h3>
+          <p><strong>📍</strong> {{ event.location }}</p>
+          <p><strong>🕒</strong> {{ event.startDate | date: 'shortDate' }}</p>
+          <button class="details-button" (click)="goToDetails(event.id)">Dettagli</button>
+        </div>
+      </div>
+    </div>
+  </div>
 
-  <!--<button mat-button routerLink="/registration">Registrazione</button>
-  <button mat-button routerLink="/admin">Admin</button>
-  <button mat-button routerLink="/preferiti">Preferiti</button>
-  <button mat-button routerLink="/profile">Profilo</button>-->
+  <button class="arrow right" (click)="nextSlide()" [disabled]="currentIndex + maxVisible >= events.length">›</button>
 </div>

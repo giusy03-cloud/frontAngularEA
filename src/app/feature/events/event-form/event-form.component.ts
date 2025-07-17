@@ -49,19 +49,19 @@ export class EventFormComponent implements OnInit {
 
     if (this.isEdit) {
       this.eventService.getEventsPaged(0, 100).subscribe(data => {
-        const event = data.content.find(e => e.id === +this.eventId!);
+        const event = data.find(e => e.id === +this.eventId!);
         if (event) {
           this.eventForm.patchValue({
             ...event,
-            startDate: event.startDate.slice(0, 16),
-            endDate: event.endDate.slice(0, 16)
+            startDate: (typeof event.startDate === 'string' ? event.startDate : event.startDate.toISOString()).slice(0, 16),
+            endDate: (typeof event.endDate === 'string' ? event.endDate : event.endDate.toISOString()).slice(0, 16),
           });
         }
       });
     }
   }
 
-  // ✅ Validatore personalizzato
+
   dateRangeValidator(group: FormGroup): { [key: string]: any } | null {
     const start = new Date(group.get('startDate')?.value);
     const end = new Date(group.get('endDate')?.value);

@@ -2,8 +2,8 @@ export interface Event {
   id?: number;  // opzionale in creazione
   name: string;
   description?: string;
-  startDate: string; // LocalDateTime come ISO stringa, es. "2025-07-10T12:00:00"
-  endDate: string;
+  startDate: string | Date; // LocalDateTime come ISO stringa, es. "2025-07-10T12:00:00"
+  endDate: string | Date;
   location: string;
   organizerId: number;
   price?: number;

@@ -1,0 +1,47 @@
+<h2>Submit your Review</h2>
+
+<form (ngSubmit)="submit()" #form="ngForm" class="review-form">
+
+  <input
+    type="number"
+    name="userId"
+    [(ngModel)]="review.userId"
+    placeholder="User ID"
+    required
+    #userId="ngModel"
+  />
+  <div *ngIf="userId.invalid && userId.touched" class="error">User ID is required</div>
+
+  <!-- Associa eventId a review.eventId -->
+  <input type="hidden" name="eventId" [(ngModel)]="review.eventId" [value]="eventId" />
+
+  <div class="star-rating">
+    <input type="radio" id="5-stars" name="rating" [(ngModel)]="review.rating" [value]="5" required #rating="ngModel" />
+    <label for="5-stars">&#9733;</label>
+
+    <input type="radio" id="4-stars" name="rating" [(ngModel)]="review.rating" [value]="4" />
+    <label for="4-stars">&#9733;</label>
+
+    <input type="radio" id="3-stars" name="rating" [(ngModel)]="review.rating" [value]="3" />
+    <label for="3-stars">&#9733;</label>
+
+    <input type="radio" id="2-stars" name="rating" [(ngModel)]="review.rating" [value]="2" />
+    <label for="2-stars">&#9733;</label>
+
+    <input type="radio" id="1-star" name="rating" [(ngModel)]="review.rating" [value]="1" />
+    <label for="1-star">&#9733;</label>
+  </div>
+
+  <div *ngIf="rating.invalid && rating.touched" class="error">Please select a rating</div>
+
+  <textarea
+    name="comment"
+    [(ngModel)]="review.comment"
+    placeholder="Comment"
+    required
+    #comment="ngModel"
+  ></textarea>
+  <div *ngIf="comment.invalid && comment.touched" class="error">Comment is required</div>
+
+  <button type="submit" [disabled]="form.invalid">Submit</button>
+</form>
