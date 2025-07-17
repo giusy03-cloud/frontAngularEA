@@ -6,6 +6,8 @@
   <p><strong>Descrizione:</strong> {{ event.description }}</p>
 
   <button class="back-button" (click)="goBack()">Torna indietro</button>
+
+  <button class="book-button" (click)="bookEvent()">Prenota</button>
 </div>
 
 <div *ngIf="!event">

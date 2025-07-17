@@ -1,7 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { EventService } from '../../../services/event.service';
+import { AuthService } from '../../../services/auth.service';
+import { BookingService } from '../../../services/booking.service';
 import { Event } from '../../../models/event.model';
 import { Location } from '@angular/common';
 
@@ -18,7 +20,10 @@ export class EventDetailsComponent implements OnInit {
   constructor(
     private route: ActivatedRoute,
     private eventService: EventService,
-    private location: Location
+    private authService: AuthService,
+    private bookingService: BookingService,
+    private location: Location,
+    private router: Router
   ) {}
 
   goBack() {
@@ -37,5 +42,34 @@ export class EventDetailsComponent implements OnInit {
         }
       });
     }
+  }
+
+  bookEvent(): void {
+    if (!this.authService.isAuthenticated()) {
+      alert('Devi essere loggato per prenotare un evento.');
+      this.router.navigate(['/login']);
+      return;
+    }
+
+    if (!this.event) {
+      alert('Evento non disponibile.');
+      return;
+    }
+
+    if ((this.event as any).status === 'CANCELLED') {
+      alert('Non puoi prenotare un evento cancellato.');
+      return;
+    }
+
+    const booking = {
+      userId: this.authService.getUserId()!,
+      eventId: this.event.id!,
+      bookingTime: new Date().toISOString()
+    };
+
+    this.bookingService.createBooking(booking).subscribe({
+      next: () => alert('Prenotazione effettuata con successo!'),
+      error: () => alert('Errore durante la prenotazione. Riprova più tardi.')
+    });
   }
 }
