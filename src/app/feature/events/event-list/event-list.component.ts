@@ -129,15 +129,23 @@ export class EventListComponent implements OnInit {
     this.loadEvents(true);
   }
 
+
   deleteEvent(id: number): void {
     if (confirm('Sei sicuro di voler eliminare questo evento?')) {
+      console.log(`Eliminazione evento ID: ${id}`);
       this.eventsService.deleteEvent(id).subscribe({
         next: () => {
+          console.log(`Evento ID ${id} eliminato`);
           this.events = this.events.filter(e => e.id !== id);
           this.totalElements--;
         },
         error: (err) => {
           console.error('Errore eliminazione evento:', err);
+          if (err.status === 403) {
+            alert('Non puoi eliminare questo evento perché non sei l’organizer.');
+          } else {
+            alert('Errore durante l\'eliminazione dell\'evento. Riprova più tardi.');
+          }
         }
       });
     }
@@ -178,17 +186,40 @@ export class EventListComponent implements OnInit {
     });
   }
 
+
+
   loadMore(): void {
-    if (this.isLoading) return;
-
-    // Se abbiamo già tutti gli eventi (showHideButton = false), fermati
-    if (!this.showHideButton) return;
-
+    if ((this.page + 1) * this.size >= this.totalElements) {
+      console.log('Nessun altro evento da caricare');
+      return; // niente da caricare
+    }
     this.page++;
-    this.loadEvents(false);
+    console.log(`Carico pagina successiva: ${this.page}`);
+    this.loadEvents(false); // carica senza resettare la lista
   }
+
 
   goToDetails(eventId: number): void {
     this.router.navigate(['/events', eventId]);
+  }
+
+  updateEvent(event: Event): void {
+    console.log('updateEvent chiamato per evento:', event);
+    this.eventsService.updateEvent(event).subscribe({
+      next: () => {
+
+        this.events = this.events.map(e => e.id === event.id ? event : e);
+        // Redirect alla pagina di modifica:
+        this.router.navigate(['/events/edit', event.id]);
+      },
+      error: (err) => {
+        console.error('Errore modifica evento:', err);
+        if (err.status === 403) {
+          alert('Non puoi modificare questo evento perché non sei l’organizer.');
+        } else {
+          alert('Errore durante la modifica dell\'evento. Riprova più tardi.');
+        }
+      }
+    });
   }
 }
