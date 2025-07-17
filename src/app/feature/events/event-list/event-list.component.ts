@@ -6,8 +6,8 @@ import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from '../../../services/auth.service';
 import { RouterModule } from '@angular/router';
-import {BookingService} from '../../../services/booking.service';
-import {Booking} from '../../../models/booking.model';
+import { BookingService } from '../../../services/booking.service';
+import { Booking } from '../../../models/booking.model';
 
 @Component({
   selector: 'app-event-list',
@@ -27,9 +27,8 @@ export class EventListComponent implements OnInit {
   totalElements = 0;
 
   isOrganizer = false;
-  showHideButton=false;
+  showHideButton = false;
 
-  // Flag per capire se siamo in ricerca per nome o location, o lista completa
   currentSearchType: 'NONE' | 'NAME' | 'LOCATION' = 'NONE';
 
   constructor(
@@ -39,13 +38,10 @@ export class EventListComponent implements OnInit {
     private router: Router
   ) {}
 
-
   ngOnInit(): void {
     const role = this.authService.getRole();
-    console.log('Ruolo utente:', role);
     this.isOrganizer = role === 'ORGANIZER';
     this.currentSearchType = 'NONE';
-    console.log('Chiamo loadEvents da ngOnInit');
     this.loadEvents(true);
   }
 
@@ -54,8 +50,6 @@ export class EventListComponent implements OnInit {
     this.router.navigate(['/auth/login']);
   }
 
-
-
   loadEvents(reset = true): void {
     if (reset) {
       this.page = 0;
@@ -63,64 +57,51 @@ export class EventListComponent implements OnInit {
     }
 
     this.isLoading = true;
-    console.log(`Caricamento eventi, pagina: ${this.page}, size: ${this.size}`);
+    let obs;
+
     if (this.currentSearchType === 'NAME' && this.searchName.trim()) {
-      this.eventsService.searchByNamePaged(this.searchName.trim(), this.page, this.size).subscribe({
-        next: (response) => {
-          this.handlePagedResponse(response, reset);
-        },
-        error: (err) => {
-          console.error('Errore nella ricerca per nome:', err);
-          this.isLoading = false;
-        }
-      });
-    }
-
-    else if (this.currentSearchType === 'LOCATION' && this.searchLocation.trim()) {
-      this.eventsService.searchByLocationPaged(this.searchLocation.trim(), this.page, this.size).subscribe({
-        next: (response) => {
-          this.handlePagedResponse(response, reset);
-        },
-        error: (err) => {
-          console.error('Errore nel caricamento ricerca per location:', err);
-          this.isLoading = false;
-        }
-      });
+      obs = this.eventsService.searchByNamePaged(this.searchName.trim(), this.page, this.size);
+    } else if (this.currentSearchType === 'LOCATION' && this.searchLocation.trim()) {
+      obs = this.eventsService.searchByLocationPaged(this.searchLocation.trim(), this.page, this.size);
     } else {
-      this.eventsService.getEventsPaged(this.page, this.size).subscribe({
-        next: (response) => {
-          this.handlePagedResponse(response, reset);
-        },
-        error: (err) => {
-          console.error('Errore nel caricamento eventi:', err);
-          this.isLoading = false;
-        }
-      });
+      obs = this.eventsService.getEventsPaged(this.page, this.size);
     }
+
+    obs.subscribe({
+      next: (response) => this.handlePagedResponse(response, reset),
+      error: (err) => {
+        console.error('Errore nel caricamento eventi:', err);
+        this.isLoading = false;
+      }
+    });
   }
 
-  private handlePagedResponse(response: { content: Event[], totalElements: number }, reset: boolean): void {
-    console.log('Risposta ricevuta dal backend:', response);
-    this.events = reset ? response.content : [...this.events, ...response.content];
-    this.totalElements = response.totalElements;
+  private handlePagedResponse(response: Event[], reset: boolean): void {
+    if (Array.isArray(response)) {
+      if (reset) {
+        this.events = response;
+      } else {
+        this.events = [...this.events, ...response];
+      }
+      // Se meno eventi di 'size' significa che non ce ne sono altri
+      this.showHideButton = response.length === this.size;
+    } else {
+      // Per sicurezza, se arriva altro
+      this.events = reset ? [] : this.events;
+      this.showHideButton = false;
+    }
     this.isLoading = false;
-    console.log(`Eventi caricati totali: ${this.events.length} su ${this.totalElements}`);
-    this.showHideButton = this.events.length > this.size;
   }
-
 
   hideExtraEvents(): void {
     if (this.events.length > this.size) {
-      this.events.splice(-this.size); // Rimuove gli ultimi 10 eventi
-      this.page--; // Torna alla pagina precedente
-
+      this.events.splice(-this.size);
+      this.page--;
       if (this.events.length <= this.size) {
         this.showHideButton = false;
       }
     }
   }
-
-
 
   searchByName(): void {
     if (!this.searchName.trim()) {
@@ -150,10 +131,8 @@ export class EventListComponent implements OnInit {
 
   deleteEvent(id: number): void {
     if (confirm('Sei sicuro di voler eliminare questo evento?')) {
-      console.log(`Eliminazione evento ID: ${id}`);
       this.eventsService.deleteEvent(id).subscribe({
         next: () => {
-          console.log(`Evento ID ${id} eliminato`);
           this.events = this.events.filter(e => e.id !== id);
           this.totalElements--;
         },
@@ -163,8 +142,6 @@ export class EventListComponent implements OnInit {
       });
     }
   }
-
-
 
   bookEvent(eventId: number): void {
     const event = this.events.find(e => e.id === eventId);
@@ -201,14 +178,17 @@ export class EventListComponent implements OnInit {
     });
   }
 
-
   loadMore(): void {
-    if ((this.page + 1) * this.size >= this.totalElements) {
-      console.log('Nessun altro evento da caricare');
-      return; // niente da caricare
-    }
+    if (this.isLoading) return;
+
+    // Se abbiamo già tutti gli eventi (showHideButton = false), fermati
+    if (!this.showHideButton) return;
+
     this.page++;
-    console.log(`Carico pagina successiva: ${this.page}`);
-    this.loadEvents(false); // carica senza resettare la lista
+    this.loadEvents(false);
+  }
+
+  goToDetails(eventId: number): void {
+    this.router.navigate(['/events', eventId]);
   }
 }

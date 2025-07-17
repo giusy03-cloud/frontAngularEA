@@ -1,0 +1,11 @@
+<div *ngIf="event" class="event-details">
+  <h2>{{ event.name }}</h2>
+  <p><strong>Luogo:</strong> {{ event.location }}</p>
+  <p><strong>Data inizio:</strong> {{ event.startDate | date:'medium' }}</p>
+  <p><strong>Data fine:</strong> {{ event.endDate | date:'medium' }}</p>
+  <p><strong>Descrizione:</strong> {{ event.description }}</p>
+</div>
+
+<div *ngIf="!event">
+  <p>Caricamento in corso o evento non trovato.</p>
+</div>

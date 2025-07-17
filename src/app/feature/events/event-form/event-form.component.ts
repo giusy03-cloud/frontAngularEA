@@ -53,8 +53,8 @@ export class EventFormComponent implements OnInit {
         if (event) {
           this.eventForm.patchValue({
             ...event,
-            startDate: event.startDate.slice(0, 16),
-            endDate: event.endDate.slice(0, 16)
+            startDate: (typeof event.startDate === 'string' ? event.startDate : event.startDate.toISOString()).slice(0, 16),
+            endDate: (typeof event.endDate === 'string' ? event.endDate : event.endDate.toISOString()).slice(0, 16),
           });
         }
       });

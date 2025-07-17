@@ -1,0 +1,12 @@
+<div>
+  <h3>Average rating: {{ averageRating }} / 5</h3>
+
+  <div *ngIf="reviews.length === 0">No reviews yet.</div>
+
+  <div *ngFor="let review of reviews" class="review-item">
+    <p><strong>User:</strong> {{ review.userId }}</p>
+    <p><strong>Rating:</strong> {{ review.rating }} ⭐</p>
+    <p><strong>Comment:</strong> {{ review.comment }}</p>
+    <hr />
+  </div>
+</div>

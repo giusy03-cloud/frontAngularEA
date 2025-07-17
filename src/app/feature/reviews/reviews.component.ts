@@ -1,53 +1,20 @@
-import { Component, Input, OnInit } from '@angular/core';
-import { ReviewService } from '../../services/review.service';
-import { Review } from '../../models/review.model';
-import {FormsModule} from '@angular/forms';
-import {CommonModule} from '@angular/common';
+import {ReviewListComponent} from './review-list/review-list.component';
+import {ReviewFormComponent} from './review-form/review-form.component';
+import {Component, Input, OnInit} from '@angular/core';
 
 @Component({
   selector: 'app-reviews',
-  templateUrl: './reviews.component.html',
   standalone: true,
-  imports: [FormsModule,CommonModule],
-  styleUrls: ['./reviews.component.css']
+  imports: [ReviewListComponent, ReviewFormComponent],
+  template: `
+    <app-review-list [eventId]="eventId" #list></app-review-list>
+    <app-review-form [eventId]="eventId" (submitted)="list.loadReviews()"></app-review-form>
+  `
 })
 export class ReviewsComponent implements OnInit {
+  eventId: number = 12; // ID di test
 
-  @Input() eventId!: number;  // Ricevuto dal componente padre
-  userId: number = Number(localStorage.getItem('userId')); // oppure recuperalo dal tuo AuthService
+  ngOnInit() {
 
-  reviews: Review[] = [];  // ✅ necessario per il *ngFor
-  newReview: Review = {    // ✅ necessario per [(ngModel)]
-    eventId: 0,
-    userId: 0,
-    rating: 0,
-    comment: ''
-  };
-
-  constructor(private reviewService: ReviewService) {}
-
-  ngOnInit(): void {
-    this.loadReviews();
-  }
-
-  loadReviews(): void {
-    this.reviewService.getReviewsByEvent(this.eventId).subscribe(
-      data => this.reviews = data
-    );
-  }
-
-  submitReview(): void {
-    this.newReview.eventId = this.eventId;
-    this.newReview.userId = this.userId;
-
-    this.reviewService.createReview(this.newReview).subscribe(() => {
-      this.loadReviews();
-      this.newReview = {
-        eventId: this.eventId,
-        userId: this.userId,
-        rating: 0,
-        comment: ''
-      };
-    });
   }
 }

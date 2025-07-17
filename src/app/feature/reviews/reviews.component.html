@@ -1,20 +1,34 @@
-<div class="reviews-section">
-  <h3>Recensioni</h3>
-  <div *ngFor="let r of reviews" class="review">
-    <strong>⭐ {{ r.rating }}</strong>
-    <p>{{ r.comment }}</p>
-  </div>
+<h3>Recensioni Evento</h3>
 
-  <div class="review-form">
-    <h4>Lascia una recensione</h4>
-    <label>Rating:
-      <select [(ngModel)]="newReview.rating">
-        <option *ngFor="let r of [1,2,3,4,5]" [value]="r">{{r}}</option>
-      </select>
-    </label>
-    <br />
-    <textarea [(ngModel)]="newReview.comment" placeholder="Scrivi il tuo commento"></textarea>
-    <br />
-    <button (click)="submitReview()">Invia</button>
-  </div>
-</div>
+<p *ngIf="reviews.length > 0">⭐ Media Voto: {{ averageRating }}/5</p>
+<p *ngIf="reviews.length === 0">Nessuna recensione ancora.</p>
+
+<ul>
+  <li *ngFor="let review of reviews | slice:0:5">
+    <strong>Utente {{ review.userId }}</strong>: {{ review.comment }} (⭐ {{ review.rating }})
+  </li>
+</ul>
+
+<hr>
+
+<h4>Lascia una recensione</h4>
+<form (ngSubmit)="submitReview()">
+  <label>
+    User ID:
+    <input type="number" [(ngModel)]="newReview.userId" name="userId" required>
+  </label>
+
+  <label>
+    Rating:
+    <select [(ngModel)]="newReview.rating" name="rating" required>
+      <option *ngFor="let r of [1,2,3,4,5]" [value]="r">{{ r }} ⭐</option>
+    </select>
+  </label>
+
+  <label>
+    Commento:
+    <textarea [(ngModel)]="newReview.comment" name="comment" required></textarea>
+  </label>
+
+  <button type="submit">Invia</button>
+</form>
