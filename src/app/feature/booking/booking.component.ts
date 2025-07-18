@@ -12,6 +12,7 @@ import { BookingService } from '../../services/booking.service';
 import { Booking } from '../../models/booking.model';
 import { HttpClientModule } from '@angular/common/http';
 import { AuthService } from '../../services/auth.service';
+import { MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-booking',
@@ -37,7 +38,7 @@ export class BookingComponent implements OnInit {
   constructor(
     private bookingService: BookingService,
     private auth: AuthService,
-    private router: Router
+    private router: Router,private snackBar: MatSnackBar
   ) {}
 
   ngOnInit(): void {
@@ -81,4 +82,7 @@ export class BookingComponent implements OnInit {
     input.value = '';
     this.dataSource.filter = '';
   }
+
+
+
 }

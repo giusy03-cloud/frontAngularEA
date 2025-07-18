@@ -11,6 +11,12 @@ export class BookingService {
 
   constructor(private http: HttpClient) {}
 
+  private getAuthHeaders(): HttpHeaders {
+    const token = localStorage.getItem('token'); // o da dove salvi il JWT
+    return new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+  }
   createBooking(booking: Booking): Observable<any> {
     const token = localStorage.getItem('token'); // oppure tramite AuthService
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
@@ -28,6 +34,28 @@ export class BookingService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get<Booking[]>(`${this.baseUrl}/user/${userId}`, { headers });
   }
+
+  getBookingsByEvent(eventId: number): Observable<Booking[]> {
+    const token = localStorage.getItem('token');
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<Booking[]>(`${this.baseUrl}/event/${eventId}`, { headers });
+  }
+
+  getBookingCount(eventId: number): Observable<number> {
+    return this.http.get<number>(`${this.baseUrl}/event/${eventId}/count`);
+  }
+  getUserBookings(userId: number): Observable<Booking[]> {
+    return this.http.get<Booking[]>(`${this.baseUrl}/user/${userId}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
+  deleteBooking(bookingId: number): Observable<any> {
+    return this.http.delete(`${this.baseUrl}/${bookingId}`, {
+      headers: this.getAuthHeaders()
+    });
+  }
+
 
 
 

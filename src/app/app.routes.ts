@@ -89,7 +89,14 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./feature/reviews/reviews.component').then(m => m.ReviewsComponent),
     //canActivate: [AuthGuard] // opzionale, se vuoi solo utenti loggati
-  }
+  },
+  {
+    path: 'my-bookings',
+    loadComponent: () =>
+      import('./feature/my-bookings/my-bookings.component').then(m => m.MyBookingsComponent),
+    canActivate: [AuthGuard]  // solo utenti autenticati
+  },
+
 
 
 

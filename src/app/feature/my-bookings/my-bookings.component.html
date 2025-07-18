@@ -1,0 +1,14 @@
+<div *ngIf="loading">Caricamento prenotazioni...</div>
+<div *ngIf="error">{{ error }}</div>
+
+<div *ngIf="!loading && !error && bookings.length === 0">
+  Nessuna prenotazione trovata.
+</div>
+
+<ul *ngIf="bookings.length > 0">
+  <li *ngFor="let booking of bookings">
+    Evento ID: {{ booking.eventId }} | Data prenotazione: {{ booking.bookingTime | date:'short' }}
+    <button *ngIf="booking.id !== undefined" (click)="deleteBooking(booking.id)">Elimina</button>
+
+  </li>
+</ul>

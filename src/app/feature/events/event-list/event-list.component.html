@@ -1,4 +1,7 @@
 <div>
+  <div *ngIf="isParticipant" style="margin-bottom: 1rem;">
+    <button routerLink="/my-bookings">Le mie prenotazioni</button>
+  </div>
   <h2>Lista Eventi</h2>
 
   <!-- Barra di ricerca -->
@@ -33,9 +36,10 @@
       <td>{{ event.startDate | date:'short' }}</td>
       <td>{{ event.endDate | date:'short' }}</td>
       <td>{{ event.price || 0 | currency:'EUR' }}</td>
-      <td>{{ event.capacity }}</td>
+      <td>
+        Posti disponibili: {{ (event.capacity ?? 0) - (event.bookedCount || 0) }} / {{ event.capacity ?? 0 }}
+      </td>
       <td>{{ event.status }}</td>
-
       <td>
         <ng-container *ngIf="isOrganizer; else participantButtons">
           <button (click)="deleteEvent(event.id!)">Elimina</button>
@@ -44,11 +48,24 @@
         </ng-container>
 
         <ng-template #participantButtons>
-          <button (click)="bookEvent(event.id!)">Prenota</button>
+          <button
+            [disabled]="
+                event.status === 'CANCELLED' ||
+                event.status === 'INACTIVE' ||
+                ((event.capacity ?? 0) - (event.bookedCount || 0)) <= 0
+              "
+            (click)="bookEvent(event.id!)"
+          >
+            Prenota
+          </button>
           <button (click)="goToDetails(event.id!)">Dettagli</button>
+
+          <!-- Messaggio posti esauriti -->
+          <div *ngIf="((event.capacity ?? 0) - (event.bookedCount || 0)) <= 0" style="color: red; font-weight: bold; margin-top: 0.3rem;">
+            Posti esauriti
+          </div>
         </ng-template>
       </td>
-
     </tr>
     </tbody>
   </table>
@@ -60,8 +77,14 @@
   <div *ngIf="isLoading">Caricamento eventi...</div>
 
   <!-- Pulsante Carica altri -->
-
-  <div *ngIf="events && events.length > 0 && totalElements !== undefined && (page + 1) * size < totalElements">
+  <div
+    *ngIf="
+      events &&
+      events.length > 0 &&
+      totalElements !== undefined &&
+      (page + 1) * size < totalElements
+    "
+  >
     <button (click)="loadMore()" [disabled]="isLoading">Carica altri eventi</button>
   </div>
 
@@ -70,13 +93,9 @@
     <button (click)="hideExtraEvents()">🔼 Nascondi eventi</button>
   </div>
 
-
   <!-- Crea evento (solo organizer) -->
   <div style="margin-top: 1rem;">
     <button *ngIf="isOrganizer" routerLink="/events/create">Crea Nuovo Evento</button>
     <button mat-button (click)="logout()">Logout</button>
-
   </div>
-
-
 </div>

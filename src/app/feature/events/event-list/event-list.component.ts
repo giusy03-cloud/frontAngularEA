@@ -21,6 +21,7 @@ export class EventListComponent implements OnInit {
   searchName = '';
   searchLocation = '';
   isLoading = false;
+  isParticipant = false;
 
   page = 0;
   size = 10;
@@ -41,6 +42,7 @@ export class EventListComponent implements OnInit {
   ngOnInit(): void {
     const role = this.authService.getRole();
     this.isOrganizer = role === 'ORGANIZER';
+    this.isParticipant = role === 'PARTICIPANT';
     this.currentSearchType = 'NONE';
     this.loadEvents(true);
   }
@@ -50,7 +52,6 @@ export class EventListComponent implements OnInit {
     this.router.navigate(['/auth/login']);
   }
 
-
   loadEvents(reset = true): void {
     if (reset) {
       this.page = 0;
@@ -58,79 +59,51 @@ export class EventListComponent implements OnInit {
     }
 
     this.isLoading = true;
-    console.log(`Caricamento eventi, pagina: ${this.page}, size: ${this.size}`);
-    if (this.currentSearchType === 'NAME' && this.searchName.trim()) {
-      this.eventsService.searchByNamePaged(this.searchName.trim(), this.page, this.size).subscribe({
-        next: (response) => {
-          this.handlePagedResponse(response, reset);
-        },
-        error: (err) => {
-          console.error('Errore nella ricerca per nome:', err);
-          this.isLoading = false;
-        }
-      });
-    }
 
-    else if (this.currentSearchType === 'LOCATION' && this.searchLocation.trim()) {
-      this.eventsService.searchByLocationPaged(this.searchLocation.trim(), this.page, this.size).subscribe({
-        next: (response) => {
-          this.handlePagedResponse(response, reset);
-        },
-        error: (err) => {
-          console.error('Errore nel caricamento ricerca per location:', err);
-          this.isLoading = false;
+    this.eventsService.getEventsPaged(this.page, this.size).subscribe({
+      next: (response) => {
+        if (reset) {
+          this.events = response.content;
+        } else {
+          this.events = [...this.events, ...response.content];
         }
-      });
-    } else {
-      this.eventsService.getEventsPaged(this.page, this.size).subscribe({
-        next: (response) => {
-          this.handlePagedResponse(response, reset);
-        },
-        error: (err) => {
-          console.error('Errore nel caricamento eventi:', err);
-          this.isLoading = false;
-        }
-      });
-    }
+
+        this.totalElements = response.totalElements;
+
+        this.events.forEach(event => {
+          this.bookingService.getBookingCount(event.id!).subscribe({
+            next: count => {
+              event.bookedCount = count;
+            },
+            error: err => {
+              console.error(`Errore nel caricare conteggio prenotazioni per evento ${event.id}`, err);
+              event.bookedCount = 0;
+            }
+          });
+        });
+
+        this.isLoading = false;
+      },
+      error: err => {
+        console.error('Errore nel caricamento eventi:', err);
+        this.isLoading = false;
+      }
+    });
   }
 
-
-
-  private handlePagedResponse(response: { content: Event[], totalElements: number }, reset: boolean): void {
-    if (Array.isArray(response.content)) {
-      if (reset) {
-        this.events = response.content;
-        this.page = 0;  // reset pagina quando resetti la lista
-      } else {
-        this.events = [...this.events, ...response.content];
-      }
-
-      this.totalElements = response.totalElements;
-      // Mostra bottone "Nascondi" solo se pagina > 0 (quindi abbiamo caricato almeno una pagina in più)
-      this.showHideButton = this.page > 0 && this.events.length > this.size;
-    } else {
-      if (reset) {
-        this.events = [];
-        this.page = 0;
-      }
-      this.showHideButton = false;
-    }
-
-    this.isLoading = false;
+  private hasCapacity(event: Event): boolean {
+    return (event.capacity ?? 0) > (event.bookedCount ?? 0);
   }
-
 
   hideExtraEvents(): void {
     if (this.page > 0) {
-      // Rimuovi gli ultimi `size` eventi (cioè l'ultima pagina caricata)
       this.events.splice(-this.size, this.size);
-      this.page--; // Torna indietro di una pagina
+      this.page--;
       if (this.page === 0) {
-        this.showHideButton = false; // Nascondi bottone se siamo alla prima pagina
+        this.showHideButton = false;
       }
     }
   }
-
 
   searchByName(): void {
     if (!this.searchName.trim()) {
@@ -157,7 +130,6 @@ export class EventListComponent implements OnInit {
     this.events = [];
     this.loadEvents(true);
   }
-
 
   deleteEvent(id: number): void {
     if (confirm('Sei sicuro di voler eliminare questo evento?')) {
@@ -192,6 +164,12 @@ export class EventListComponent implements OnInit {
       return;
     }
 
+    if (!this.hasCapacity(event)) {
+      alert('Posti esauriti. Non puoi prenotare questo evento.');
+      event.status = 'INACTIVE';
+      return;
+    }
+
     const userId = this.authService.getUserId();
     if (!userId) {
       alert('Devi essere loggato per prenotare un evento.');
@@ -207,26 +185,39 @@ export class EventListComponent implements OnInit {
     this.bookingService.createBooking(booking).subscribe({
       next: () => {
         alert('Prenotazione effettuata con successo!');
+
+        if (!event.bookings) {
+          event.bookings = [];
+        }
+        event.bookings.push(booking);
+
+        event.bookedCount = (event.bookedCount ?? 0) + 1;
+
+        if (!this.hasCapacity(event)) {
+          event.status = 'INACTIVE';
+        }
       },
+
       error: (err) => {
         console.error('Errore durante la prenotazione:', err);
-        alert('Errore durante la prenotazione. Riprova più tardi.');
+        if (err.status === 400 && err.error === 'Posti esauriti per questo evento') {
+          alert('Posti esauriti. Riprova più tardi.');
+        } else {
+          alert('Errore durante la prenotazione. Riprova più tardi.');
+        }
       }
     });
   }
 
-
-
   loadMore(): void {
     if ((this.page + 1) * this.size >= this.totalElements) {
       console.log('Nessun altro evento da caricare');
-      return; // niente da caricare
+      return;
     }
     this.page++;
     console.log(`Carico pagina successiva: ${this.page}`);
-    this.loadEvents(false); // carica senza resettare la lista
+    this.loadEvents(false);
   }
-
 
   goToDetails(eventId: number): void {
     this.router.navigate(['/events', eventId]);
@@ -236,9 +227,7 @@ export class EventListComponent implements OnInit {
     console.log('updateEvent chiamato per evento:', event);
     this.eventsService.updateEvent(event).subscribe({
       next: () => {
-
         this.events = this.events.map(e => e.id === event.id ? event : e);
-        // Redirect alla pagina di modifica:
         this.router.navigate(['/events/edit', event.id]);
       },
       error: (err) => {

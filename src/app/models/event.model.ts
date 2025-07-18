@@ -1,3 +1,5 @@
+import {Booking} from './booking.model';
+
 export interface Event {
   id?: number;  // opzionale in creazione
   name: string;
@@ -13,4 +15,7 @@ export interface Event {
   updatedAt?: string;
   createdBy?: number;
   updatedBy?: number;
+
+  bookings?: Booking[];
+  bookedCount?: number;
 }
