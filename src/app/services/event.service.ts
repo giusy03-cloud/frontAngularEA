@@ -17,23 +17,38 @@ export class EventService {
     return token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
   }
 
-  getEventsPaged(page: number, size: number): Observable<Event[]> {
+
+  getEventsPaged(page: number, size: number): Observable<{ content: Event[], totalElements: number }> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
-    // No headers perché endpoint pubblico
-    return this.http.get<Event[]>(`${this.baseUrl}/paged`, { params });
+
+    return this.http.get<{ content: Event[], totalElements: number }>(`${this.baseUrl}/paged`, { params });
   }
 
 
 
-  searchByNamePaged(name: string, page: number, size: number): Observable<Event[]> {
-    return this.http.get<Event[]>(`${this.baseUrl}/search/byName`, { params: { name } });
+
+
+  // 🔄 AGGIORNATO
+  searchByNamePaged(name: string, page: number, size: number): Observable<{ content: Event[], totalElements: number }> {
+    const params = new HttpParams()
+      .set('name', name)
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<{ content: Event[], totalElements: number }>(`${this.baseUrl}/search/byName`, { params });
   }
 
-  searchByLocationPaged(location: string, page: number, size: number): Observable<Event[]> {
-    return this.http.get<Event[]>(`${this.baseUrl}/search/byLocation`, { params: { location } });
+  searchByLocationPaged(location: string, page: number, size: number): Observable<{ content: Event[], totalElements: number }> {
+    const params = new HttpParams()
+      .set('location', location)
+      .set('page', page.toString())
+      .set('size', size.toString());
+
+    return this.http.get<{ content: Event[], totalElements: number }>(`${this.baseUrl}/search/byLocation`, { params });
   }
+
 
   createEvent(event: Event): Observable<Event> {
     const headers = this.getAuthHeaders();

@@ -50,6 +50,7 @@ export class EventListComponent implements OnInit {
     this.router.navigate(['/auth/login']);
   }
 
+
   loadEvents(reset = true): void {
     if (reset) {
       this.page = 0;
@@ -57,51 +58,79 @@ export class EventListComponent implements OnInit {
     }
 
     this.isLoading = true;
-    let obs;
-
+    console.log(`Caricamento eventi, pagina: ${this.page}, size: ${this.size}`);
     if (this.currentSearchType === 'NAME' && this.searchName.trim()) {
-      obs = this.eventsService.searchByNamePaged(this.searchName.trim(), this.page, this.size);
-    } else if (this.currentSearchType === 'LOCATION' && this.searchLocation.trim()) {
-      obs = this.eventsService.searchByLocationPaged(this.searchLocation.trim(), this.page, this.size);
-    } else {
-      obs = this.eventsService.getEventsPaged(this.page, this.size);
+      this.eventsService.searchByNamePaged(this.searchName.trim(), this.page, this.size).subscribe({
+        next: (response) => {
+          this.handlePagedResponse(response, reset);
+        },
+        error: (err) => {
+          console.error('Errore nella ricerca per nome:', err);
+          this.isLoading = false;
+        }
+      });
     }
 
-    obs.subscribe({
-      next: (response) => this.handlePagedResponse(response, reset),
-      error: (err) => {
-        console.error('Errore nel caricamento eventi:', err);
-        this.isLoading = false;
-      }
-    });
+    else if (this.currentSearchType === 'LOCATION' && this.searchLocation.trim()) {
+      this.eventsService.searchByLocationPaged(this.searchLocation.trim(), this.page, this.size).subscribe({
+        next: (response) => {
+          this.handlePagedResponse(response, reset);
+        },
+        error: (err) => {
+          console.error('Errore nel caricamento ricerca per location:', err);
+          this.isLoading = false;
+        }
+      });
+    } else {
+      this.eventsService.getEventsPaged(this.page, this.size).subscribe({
+        next: (response) => {
+          this.handlePagedResponse(response, reset);
+        },
+        error: (err) => {
+          console.error('Errore nel caricamento eventi:', err);
+          this.isLoading = false;
+        }
+      });
+    }
   }
 
-  private handlePagedResponse(response: Event[], reset: boolean): void {
-    if (Array.isArray(response)) {
+
+
+  private handlePagedResponse(response: { content: Event[], totalElements: number }, reset: boolean): void {
+    if (Array.isArray(response.content)) {
       if (reset) {
-        this.events = response;
+        this.events = response.content;
+        this.page = 0;  // reset pagina quando resetti la lista
       } else {
-        this.events = [...this.events, ...response];
+        this.events = [...this.events, ...response.content];
       }
-      // Se meno eventi di 'size' significa che non ce ne sono altri
-      this.showHideButton = response.length === this.size;
+
+      this.totalElements = response.totalElements;
+      // Mostra bottone "Nascondi" solo se pagina > 0 (quindi abbiamo caricato almeno una pagina in più)
+      this.showHideButton = this.page > 0 && this.events.length > this.size;
     } else {
-      // Per sicurezza, se arriva altro
-      this.events = reset ? [] : this.events;
+      if (reset) {
+        this.events = [];
+        this.page = 0;
+      }
       this.showHideButton = false;
     }
+
     this.isLoading = false;
   }
 
+
   hideExtraEvents(): void {
-    if (this.events.length > this.size) {
-      this.events.splice(-this.size);
-      this.page--;
-      if (this.events.length <= this.size) {
-        this.showHideButton = false;
+    if (this.page > 0) {
+      // Rimuovi gli ultimi `size` eventi (cioè l'ultima pagina caricata)
+      this.events.splice(-this.size, this.size);
+      this.page--; // Torna indietro di una pagina
+      if (this.page === 0) {
+        this.showHideButton = false; // Nascondi bottone se siamo alla prima pagina
       }
     }
   }
+
 
   searchByName(): void {
     if (!this.searchName.trim()) {

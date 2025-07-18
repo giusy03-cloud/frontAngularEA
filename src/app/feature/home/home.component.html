@@ -15,7 +15,6 @@
         [style.flex]="'0 0 ' + (100 / maxVisible) + '%'"
       >
         <div class="image-placeholder">
-          <!-- In futuro puoi usare <img [src]="event.imageUrl"> -->
           <div class="placeholder-icon">📅</div>
         </div>
         <div class="event-info">
@@ -28,5 +27,21 @@
     </div>
   </div>
 
-  <button class="arrow right" (click)="nextSlide()" [disabled]="currentIndex + maxVisible >= events.length">›</button>
+  <!-- Non disabilitare la freccia destra, gestiamo diversamente -->
+  <button class="arrow right" (click)="onNextClick()">›</button>
+
+
+  <!-- Modal popup per "Vuoi visualizzare altri eventi?" -->
+  <div class="modal-overlay" *ngIf="showLoadMorePrompt">
+    <div class="modal-content">
+      <p>Vuoi visualizzare altri eventi?</p>
+      <div class="modal-buttons">
+        <button (click)="loadMore()">Sì</button>
+        <button (click)="dismissLoadMorePrompt()">No</button>
+      </div>
+    </div>
+  </div>
+
+
+
 </div>

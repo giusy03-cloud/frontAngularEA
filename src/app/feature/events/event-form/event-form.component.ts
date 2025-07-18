@@ -49,7 +49,7 @@ export class EventFormComponent implements OnInit {
 
     if (this.isEdit) {
       this.eventService.getEventsPaged(0, 100).subscribe(data => {
-        const event = data.find(e => e.id === +this.eventId!);
+        const event = data.content.find((e: Event) => e.id === +this.eventId!);
         if (event) {
           this.eventForm.patchValue({
             ...event,
@@ -59,6 +59,8 @@ export class EventFormComponent implements OnInit {
         }
       });
     }
+
+
   }
 
 

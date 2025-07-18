@@ -35,12 +35,20 @@
       <td>{{ event.price || 0 | currency:'EUR' }}</td>
       <td>{{ event.capacity }}</td>
       <td>{{ event.status }}</td>
+
       <td>
-        <button *ngIf="isOrganizer" (click)="deleteEvent(event.id!)">Elimina</button>
-        <button (click)="updateEvent(event)">Modifica Evento</button>
-        <button *ngIf="!isOrganizer" (click)="bookEvent(event.id!)">Prenota</button>
-        <button (click)="goToDetails(event.id!)">Dettagli</button>
+        <ng-container *ngIf="isOrganizer; else participantButtons">
+          <button (click)="deleteEvent(event.id!)">Elimina</button>
+          <button (click)="updateEvent(event)">Modifica Evento</button>
+          <button (click)="goToDetails(event.id!)">Dettagli</button>
+        </ng-container>
+
+        <ng-template #participantButtons>
+          <button (click)="bookEvent(event.id!)">Prenota</button>
+          <button (click)="goToDetails(event.id!)">Dettagli</button>
+        </ng-template>
       </td>
+
     </tr>
     </tbody>
   </table>
