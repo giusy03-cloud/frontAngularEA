@@ -3,14 +3,15 @@
     <a routerLink="/" class="logo-text">TicketTwo</a>
   </div>
 
+
   <nav class="nav-links">
-    <!-- Se NON autenticato e siamo nella pagina login, mostra SOLO "Ritorna alla Home" -->
-    <a *ngIf="!isLoggedIn && isLoginPage" routerLink="/" class="nav-link">
+    <!-- Se NON autenticato e siamo nella pagina login o registrazione, mostra SOLO "Ritorna alla Home" -->
+    <a *ngIf="!isLoggedIn && isLoginOrRegistrationPage" routerLink="/" class="nav-link">
       ← Ritorna alla Home
     </a>
 
-    <!-- Se NON autenticato e NON siamo in pagina login, mostra SOLO "Login" -->
-    <a *ngIf="!isLoggedIn && !isLoginPage" routerLink="/auth/login" class="nav-link">
+    <!-- Se NON autenticato e NON siamo in pagina login o registrazione, mostra SOLO "Login" -->
+    <a *ngIf="!isLoggedIn && !isLoginOrRegistrationPage" routerLink="/auth/login" class="nav-link">
       Login
     </a>
 
@@ -20,4 +21,5 @@
       <a (click)="logout()" class="nav-link">Logout</a>
     </ng-container>
   </nav>
+
 </header>

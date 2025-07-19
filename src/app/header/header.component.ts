@@ -13,7 +13,7 @@ import { RouterModule } from '@angular/router';
 })
 export class HeaderComponent implements OnInit {
   isLoggedIn = false;
-  isLoginPage = false;
+  isLoginOrRegistrationPage = false;
 
   constructor(public authService: AuthService, private router: Router) {}
 
@@ -29,12 +29,12 @@ export class HeaderComponent implements OnInit {
 
   checkState() {
     this.isLoggedIn = this.authService.isAuthenticated();
-    this.isLoginPage = this.router.url.startsWith('/auth/login');
+    this.isLoginOrRegistrationPage =
+      this.router.url.startsWith('/auth/login') || this.router.url.startsWith('/auth/registration');
   }
 
-  logout() {
+  logout(): void {
     this.authService.logout();
-    alert('Logout effettuato');
-    this.router.navigate(['/']);
+    this.router.navigate(['/auth/login']);
   }
 }
