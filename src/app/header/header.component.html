@@ -4,9 +4,18 @@
   </div>
 
   <nav class="nav-links">
-    <a *ngIf="!authService.isAuthenticated()" routerLink="auth/login" class="nav-link">Login</a>
+    <!-- Se NON autenticato e siamo nella pagina login, mostra SOLO "Ritorna alla Home" -->
+    <a *ngIf="!isLoggedIn && isLoginPage" routerLink="/" class="nav-link">
+      ← Ritorna alla Home
+    </a>
 
-    <ng-container *ngIf="authService.isAuthenticated()">
+    <!-- Se NON autenticato e NON siamo in pagina login, mostra SOLO "Login" -->
+    <a *ngIf="!isLoggedIn && !isLoginPage" routerLink="/auth/login" class="nav-link">
+      Login
+    </a>
+
+    <!-- Se autenticato, mostra Profilo e Logout -->
+    <ng-container *ngIf="isLoggedIn">
       <a routerLink="/profile" class="nav-link">Profilo</a>
       <a (click)="logout()" class="nav-link">Logout</a>
     </ng-container>
