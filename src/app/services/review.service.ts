@@ -33,4 +33,14 @@ export class ReviewService {
       headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
     });
   }
+
+  canUserReview(userId: number, eventId: number): Observable<boolean> {
+    const token = localStorage.getItem('token');
+    const headers = {
+      'Authorization': `Bearer ${token}`
+    };
+
+    return this.http.get<boolean>(`/api/reviews/can-review?userId=${userId}&eventId=${eventId}`, { headers });
+  }
+
 }

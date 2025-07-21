@@ -14,6 +14,7 @@ export class EventService {
 
   private getAuthHeaders(): HttpHeaders {
     const token = this.authService.getToken();
+    console.log('Token usato per gli eventi:', token);
     return token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
   }
 
@@ -28,9 +29,6 @@ export class EventService {
 
 
 
-
-
-  // 🔄 AGGIORNATO
   searchByNamePaged(name: string, page: number, size: number): Observable<{ content: Event[], totalElements: number }> {
     const params = new HttpParams()
       .set('name', name)
@@ -81,7 +79,4 @@ export class EventService {
     return this.http.get<Event>(`${this.baseUrl}/${id}`, { headers });
   }
 
-  getEvents(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}`);
-  }
 }
