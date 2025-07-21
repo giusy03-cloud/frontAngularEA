@@ -23,16 +23,15 @@ export class ReviewService {
   }
 
   submitReview(review: Review): Observable<Review> {
-    const body = new HttpParams()
-      .set('userId', review.userId.toString())
-      .set('eventId', review.eventId.toString())
-      .set('rating', review.rating.toString())
-      .set('comment', review.comment);
+    const token = localStorage.getItem('token');
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
 
-    return this.http.post<Review>(`${this.apiBase}/form`, body.toString(), {
-      headers: { 'Content-Type': 'application/x-www-form-urlencoded' }
-    });
+    return this.http.post<Review>(`${this.apiBase}`, review, { headers });
   }
+
 
   canUserReview(userId: number, eventId: number): Observable<boolean> {
     const token = localStorage.getItem('token');
