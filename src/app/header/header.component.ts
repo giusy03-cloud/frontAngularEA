@@ -30,7 +30,7 @@ export class HeaderComponent implements OnInit {
   checkState() {
     this.isLoggedIn = this.authService.isAuthenticated();
     this.isLoginOrRegistrationPage =
-      this.router.url.startsWith('/auth/login') || this.router.url.startsWith('/auth/registration');
+      this.router.url.startsWith('/auth/login') || this.router.url.startsWith('/auth/register');
   }
 
   logout(): void {

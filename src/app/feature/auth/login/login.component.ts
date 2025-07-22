@@ -43,6 +43,13 @@ export class LoginComponent {
     });
   }
 
+  loginWithGoogle() {
+    // Questo URL è l'endpoint del backend per l'OAuth2 di Google
+    // Modifica con il tuo URL corretto se serve
+    window.location.href = 'http://localhost:8080/oauth2/authorization/google';
+  }
+
+
 
 
 }

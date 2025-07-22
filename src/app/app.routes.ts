@@ -117,6 +117,12 @@ export const routes: Routes = [
     loadComponent: () => import('./feature/profile/profile.component').then(m => m.ProfileComponent)
   },
 
+  {
+    path: 'oauth-callback',
+    loadComponent: () =>
+      import('./feature/oauth-callback/oauth-callback.component').then(m => m.OauthCallbackComponent)
+  }
+
 
 
 

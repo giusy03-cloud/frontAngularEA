@@ -51,3 +51,18 @@ a:hover {
 p[style] {
   margin: 0;
 }
+
+
+.google-login-btn {
+  margin-top: 1rem;
+  background-color: #4285F4;
+  color: white;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.google-login-btn:hover {
+  background-color: #357ae8;
+}

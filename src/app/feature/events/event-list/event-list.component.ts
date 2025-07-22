@@ -71,6 +71,7 @@ export class EventListComponent implements OnInit {
     this.router.navigate(['/auth/login']);
   }
 
+
   loadEvents(reset = true): void {
     if (reset) {
       this.page = 0;
@@ -101,6 +102,9 @@ export class EventListComponent implements OnInit {
           });
         });
 
+        // Mostra il pulsante Nascondi solo se siamo oltre la prima pagina
+        this.showHideButton = this.page > 0;
+
         this.isLoading = false;
       },
       error: err => {
@@ -109,6 +113,7 @@ export class EventListComponent implements OnInit {
       }
     });
   }
+
 
   private hasCapacity(event: Event): boolean {
     return (event.capacity ?? 0) > (event.bookedCount ?? 0);
