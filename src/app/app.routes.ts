@@ -114,6 +114,12 @@ export const routes: Routes = [
 
 
 
+  {
+    path: 'profile',
+    loadComponent: () => import('./feature/profile/profile.component').then(m => m.ProfileComponent)
+  },
+
+
 
 
 ];

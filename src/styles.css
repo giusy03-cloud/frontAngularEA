@@ -1,4 +1,162 @@
-/* You can add global styles to this file, and also import other style files */
+/* styles.css - Stile TicketOne Unificato */
+:root {
+  --ticketone-red: #e2001a;
+  --ticketone-dark: #333333;
+  --ticketone-light: #f5f5f5;
+  --ticketone-white: #ffffff;
+  --ticketone-blue: #0066cc;
+  --ticketone-gray: #6c757d;
+}
 
-html, body { height: 100%; }
-body {font-family: 'Segoe UI', 'Roboto', 'Helvetica Neue', sans-serif;}
+/* Stile Base */
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: var(--ticketone-light);
+  color: var(--ticketone-dark);
+  margin: 0;
+  padding: 0;
+}
+
+h1, h2, h3 {
+  color: var(--ticketone-dark);
+}
+
+/* Card Eventi */
+.event-card,
+.event-details,
+form,
+mat-card {
+  background: var(--ticketone-white);
+  border-radius: 12px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  margin: 1.5rem auto;
+  padding: 1.5rem;
+  max-width: 600px;
+}
+
+.event-details h2,
+.carousel-title {
+  color: var(--ticketone-red);
+  margin-bottom: 1.5rem;
+  font-size: 1.8rem;
+}
+
+/* Bottoni */
+button,
+.back-button,
+.book-button,
+.details-button,
+.modal-buttons button {
+  background-color: var(--ticketone-red);
+  color: var(--ticketone-white);
+  border: none;
+  border-radius: 6px;
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  letter-spacing: 0.5px;
+}
+
+button:hover,
+.back-button:hover,
+.book-button:hover,
+.details-button:hover {
+  background-color: #c00016;
+  transform: translateY(-1px);
+}
+
+.back-button {
+  background-color: var(--ticketone-gray);
+}
+
+/* Form */
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+input,
+select,
+textarea {
+  padding: 0.8rem;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: border 0.3s;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  border-color: var(--ticketone-red);
+  outline: none;
+}
+
+/* Carousel */
+#carousel-container {
+  background: linear-gradient(to right, #f8f9fa, #ffffff);
+  border-radius: 16px;
+  padding: 2rem;
+  margin: 2rem auto;
+}
+
+.carousel-track {
+  display: flex;
+  gap: 1.5rem;
+  padding: 1rem 0;
+}
+
+.image-placeholder {
+  background-color: #e9ecef;
+  color: #adb5bd;
+}
+
+/* Tabella */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  background: var(--ticketone-white);
+}
+
+th {
+  background-color: var(--ticketone-red);
+  color: var(--ticketone-white);
+  padding: 1rem;
+}
+
+td {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+}
+
+tr:hover {
+  background-color: #f9f9f9;
+}
+
+/* Modal */
+.modal-overlay {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
+.modal-content {
+  max-width: 400px;
+  border-radius: 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .event-card,
+  .event-details,
+  form {
+    margin: 1rem;
+    padding: 1rem;
+  }
+
+  .carousel-track {
+    gap: 1rem;
+  }
+}

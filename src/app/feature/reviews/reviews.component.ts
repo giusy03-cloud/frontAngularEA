@@ -12,7 +12,9 @@ import {Component, Input, OnInit} from '@angular/core';
   `
 })
 export class ReviewsComponent implements OnInit {
-  eventId: number = 12; // ID di test
+  @Input() eventId!: number;
+  @Input() canReview: boolean = false;
+
 
   ngOnInit() {
 

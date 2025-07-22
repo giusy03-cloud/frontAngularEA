@@ -1,14 +1,23 @@
-<div *ngIf="loading">Caricamento prenotazioni...</div>
-<div *ngIf="error">{{ error }}</div>
-
-<div *ngIf="!loading && !error && bookings.length === 0">
-  Nessuna prenotazione trovata.
+<div>
+  <label>
+    <input type="radio" name="filter" value="all" [(ngModel)]="filter" /> Tutti
+  </label>
+  <label>
+    <input type="radio" name="filter" value="past" [(ngModel)]="filter" /> Già avvenuti
+  </label>
+  <label>
+    <input type="radio" name="filter" value="upcoming" [(ngModel)]="filter" /> Da avvenire
+  </label>
 </div>
 
-<ul *ngIf="bookings.length > 0">
-  <li *ngFor="let booking of bookings">
-    Evento ID: {{ booking.eventId }} | Data prenotazione: {{ booking.bookingTime | date:'short' }}
-    <button *ngIf="booking.id !== undefined" (click)="deleteBooking(booking.id)">Elimina</button>
+<input [(ngModel)]="searchTerm" placeholder="Cerca evento..." />
 
+<ul>
+  <li *ngFor="let booking of filteredBookings()">
+    <strong>{{ getEventName(booking.eventId) }}</strong><br>
+    <button *ngIf="isEventPast(booking.eventId)" (click)="goToReview(booking.eventId)">
+      Recensisci evento
+    </button>
+    <button (click)="deleteBooking(booking.eventId)">Cancella</button>
   </li>
 </ul>

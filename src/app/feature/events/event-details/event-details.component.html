@@ -6,8 +6,16 @@
   <p><strong>Descrizione:</strong> {{ event.description }}</p>
 
   <button class="back-button" (click)="goBack()">Torna indietro</button>
-
   <button class="book-button" (click)="bookEvent()">Prenota</button>
+
+  <!-- 🔽 Blocchi per recensioni -->
+  <ng-container *ngIf="!checkInProgress">
+    <app-reviews *ngIf="event?.id" [eventId]="event.id!" [canReview]="canReview"></app-reviews>
+
+    <div *ngIf="!canReview" style="margin-top: 10px; color: gray;">
+      <p>Non puoi recensire questo evento (o non l’hai prenotato, o non è ancora avvenuto).</p>
+    </div>
+  </ng-container>
 </div>
 
 <div *ngIf="!event">
