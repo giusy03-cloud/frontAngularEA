@@ -2,6 +2,9 @@ import { Routes } from '@angular/router';
 import {OrganizerGuard} from './guards/organizer.guard';
 import {AuthGuard} from './guards/auth.guard';
 import { HomeComponent } from './feature/home/home.component';
+import {DetailComponent} from './feature/favorites/detail/detail.component';
+import {CreateComponent} from './feature/favorites/create/create.component';
+import {ListComponent} from './feature/favorites/list/list.component';
 
 
 
@@ -96,6 +99,19 @@ export const routes: Routes = [
       import('./feature/my-bookings/my-bookings.component').then(m => m.MyBookingsComponent),
     canActivate: [AuthGuard]  // solo utenti autenticati
   },
+  {
+    path: 'favorites',
+    children: [
+      { path: '', component: ListComponent, canActivate: [AuthGuard] },
+      { path: 'create', component: CreateComponent, canActivate: [AuthGuard] },
+      { path: ':id', component: DetailComponent, canActivate: [AuthGuard] }
+    ]
+  },
+
+  { path: 'favorites/public/:token', component: DetailComponent }
+
+
+
 
 
 

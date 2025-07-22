@@ -1,0 +1,30 @@
+<div *ngIf="isLoading">Caricamento preferiti...</div>
+
+<div *ngIf="!isLoading && favoriteEvents.length === 0">
+  <p>Nessun evento preferito trovato.</p>
+</div>
+
+<table *ngIf="favoriteEvents.length > 0">
+  <thead>
+  <tr>
+    <th>Nome</th>
+    <th>Descrizione</th>
+    <th>Luogo</th>
+    <th>Data Inizio</th>
+    <th>Data Fine</th>
+    <th>Azioni</th>
+  </tr>
+  </thead>
+  <tbody>
+  <tr *ngFor="let event of favoriteEvents">
+    <td>{{ event.name }}</td>
+    <td>{{ event.description }}</td>
+    <td>{{ event.location }}</td>
+    <td>{{ event.startDate | date:'short' }}</td>
+    <td>{{ event.endDate | date:'short' }}</td>
+    <td>
+      <button (click)="removeFavorite(event.id!)">Rimuovi</button>
+    </td>
+  </tr>
+  </tbody>
+</table>

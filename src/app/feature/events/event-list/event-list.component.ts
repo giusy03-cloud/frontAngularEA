@@ -8,6 +8,7 @@ import { AuthService } from '../../../services/auth.service';
 import { RouterModule } from '@angular/router';
 import { BookingService } from '../../../services/booking.service';
 import { Booking } from '../../../models/booking.model';
+import { FavoriteService } from '../../../services/favorite.service';
 
 @Component({
   selector: 'app-event-list',
@@ -22,20 +23,23 @@ export class EventListComponent implements OnInit {
   searchLocation = '';
   isLoading = false;
   isParticipant = false;
+  isOrganizer = false;
+  showHideButton = false;
 
   page = 0;
   size = 10;
   totalElements = 0;
 
-  isOrganizer = false;
-  showHideButton = false;
-
   currentSearchType: 'NONE' | 'NAME' | 'LOCATION' = 'NONE';
+
+  favoriteEventIds: Set<number> = new Set();
+  isShowingFavorites = false;
 
   constructor(
     private eventsService: EventService,
     private authService: AuthService,
     private bookingService: BookingService,
+    private favoriteService: FavoriteService,
     private router: Router
   ) {}
 
@@ -44,6 +48,21 @@ export class EventListComponent implements OnInit {
     this.isOrganizer = role === 'ORGANIZER';
     this.isParticipant = role === 'PARTICIPANT';
     this.currentSearchType = 'NONE';
+
+    const userId = this.authService.getUserId();
+    const token = this.authService.getToken();
+
+    if (this.isParticipant && userId && token) {
+      this.favoriteService.getFavorites(userId, `Bearer ${token}`).subscribe({
+        next: (favorites: number[]) => {
+          this.favoriteEventIds = new Set(favorites);
+        },
+        error: (err:any) => {
+          console.error('Errore caricamento preferiti:', err);
+        }
+      });
+    }
+
     this.loadEvents(true);
   }
 
@@ -133,15 +152,12 @@ export class EventListComponent implements OnInit {
 
   deleteEvent(id: number): void {
     if (confirm('Sei sicuro di voler eliminare questo evento?')) {
-      console.log(`Eliminazione evento ID: ${id}`);
       this.eventsService.deleteEvent(id).subscribe({
         next: () => {
-          console.log(`Evento ID ${id} eliminato`);
           this.events = this.events.filter(e => e.id !== id);
           this.totalElements--;
         },
         error: (err) => {
-          console.error('Errore eliminazione evento:', err);
           if (err.status === 403) {
             alert('Non puoi eliminare questo evento perché non sei l’organizer.');
           } else {
@@ -185,21 +201,12 @@ export class EventListComponent implements OnInit {
     this.bookingService.createBooking(booking).subscribe({
       next: () => {
         alert('Prenotazione effettuata con successo!');
-
-        if (!event.bookings) {
-          event.bookings = [];
-        }
+        if (!event.bookings) event.bookings = [];
         event.bookings.push(booking);
-
         event.bookedCount = (event.bookedCount ?? 0) + 1;
-
-        if (!this.hasCapacity(event)) {
-          event.status = 'INACTIVE';
-        }
+        if (!this.hasCapacity(event)) event.status = 'INACTIVE';
       },
-
       error: (err) => {
-        console.error('Errore durante la prenotazione:', err);
         if (err.status === 400 && err.error === 'Posti esauriti per questo evento') {
           alert('Posti esauriti. Riprova più tardi.');
         } else {
@@ -210,12 +217,8 @@ export class EventListComponent implements OnInit {
   }
 
   loadMore(): void {
-    if ((this.page + 1) * this.size >= this.totalElements) {
-      console.log('Nessun altro evento da caricare');
-      return;
-    }
+    if ((this.page + 1) * this.size >= this.totalElements) return;
     this.page++;
-    console.log(`Carico pagina successiva: ${this.page}`);
     this.loadEvents(false);
   }
 
@@ -224,19 +227,96 @@ export class EventListComponent implements OnInit {
   }
 
   updateEvent(event: Event): void {
-    console.log('updateEvent chiamato per evento:', event);
     this.eventsService.updateEvent(event).subscribe({
       next: () => {
         this.events = this.events.map(e => e.id === event.id ? event : e);
         this.router.navigate(['/events/edit', event.id]);
       },
       error: (err) => {
-        console.error('Errore modifica evento:', err);
         if (err.status === 403) {
           alert('Non puoi modificare questo evento perché non sei l’organizer.');
         } else {
           alert('Errore durante la modifica dell\'evento. Riprova più tardi.');
         }
+      }
+    });
+  }
+
+
+
+  toggleFavorite(event: Event): void {
+    const userId = this.authService.getUserId();
+    const token = this.authService.getToken();
+
+    if (!userId || !token) {
+      alert('Devi essere loggato per usare i preferiti.');
+      return;
+    }
+
+    if (this.favoriteEventIds.has(event.id!)) {
+      this.favoriteEventIds.delete(event.id!);
+      this.favoriteService.removeFromFavorites(userId, event.id!, `Bearer ${token}`).subscribe({
+        next: () => {
+          console.log(`Evento ${event.id} rimosso dai preferiti.`);
+          // Rimuovi evento anche dalla lista eventi visualizzati, se stai mostrando solo preferiti
+          if (this.isShowingFavorites) {
+            this.events = this.events.filter(e => e.id !== event.id);
+            this.totalElements--;
+          }
+        },
+        error: (err:any) => console.error('Errore rimozione preferito:', err)
+      });
+    } else {
+      this.favoriteEventIds.add(event.id!);
+      this.favoriteService.addToFavorites(userId, event.id!, `Bearer ${token}`).subscribe({
+        next: () => console.log(`Evento ${event.id} aggiunto ai preferiti.`),
+        error: (err:any) => console.error('Errore aggiunta preferito:', err)
+      });
+    }
+  }
+
+
+  isFavorite(event: Event): boolean {
+    return this.favoriteEventIds.has(event.id!);
+  }
+
+  loadFavoriteEvents(): void {
+    const userId = this.authService.getUserId();
+    const token = this.authService.getToken();
+
+    if (!userId || !token) {
+      alert('Devi essere loggato per vedere i preferiti.');
+      return;
+    }
+
+    this.isShowingFavorites = true;
+    this.isLoading = true;
+
+    this.favoriteService.getFavorites(userId, `Bearer ${token}`).subscribe({
+      next: (favoriteIds: number[]) => {
+        if (favoriteIds.length === 0) {
+          this.events = [];
+          this.isLoading = false;
+          return;
+        }
+
+        // Usa EventService per caricare gli eventi dati gli ID
+
+        this.eventsService.getEventsByIds(favoriteIds, `Bearer ${token}`).subscribe({
+          next: (events) => {
+            this.events = events;
+            this.isLoading = false;
+          },
+          error: (err) => {
+            console.error('Errore caricamento eventi preferiti:', err);
+            this.isLoading = false;
+          }
+        });
+
+      },
+      error: (err) => {
+        console.error('Errore caricamento preferiti:', err);
+        this.isLoading = false;
       }
     });
   }

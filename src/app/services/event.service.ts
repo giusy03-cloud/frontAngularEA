@@ -84,4 +84,11 @@ export class EventService {
   getEvents(): Observable<any[]> {
     return this.http.get<any[]>(`${this.baseUrl}`);
   }
+
+  getEventsByIds(ids: number[], token: string): Observable<Event[]> {
+    const headers = new HttpHeaders().set('Authorization', token);
+    return this.http.post<Event[]>(`${this.baseUrl}/byIds`, ids, { headers });
+  }
+
+
 }
