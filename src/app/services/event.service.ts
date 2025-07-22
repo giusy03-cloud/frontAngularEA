@@ -18,24 +18,23 @@ export class EventService {
     return token ? new HttpHeaders().set('Authorization', `Bearer ${token}`) : new HttpHeaders();
   }
 
-
   getEventsPaged(page: number, size: number): Observable<{ content: Event[], totalElements: number }> {
     const params = new HttpParams()
       .set('page', page.toString())
       .set('size', size.toString());
+    const headers = this.getAuthHeaders();
 
-    return this.http.get<{ content: Event[], totalElements: number }>(`${this.baseUrl}/paged`, { params });
+    return this.http.get<{ content: Event[], totalElements: number }>(`${this.baseUrl}/paged`, { params, headers });
   }
-
-
 
   searchByNamePaged(name: string, page: number, size: number): Observable<{ content: Event[], totalElements: number }> {
     const params = new HttpParams()
       .set('name', name)
       .set('page', page.toString())
       .set('size', size.toString());
+    const headers = this.getAuthHeaders();
 
-    return this.http.get<{ content: Event[], totalElements: number }>(`${this.baseUrl}/search/byName`, { params });
+    return this.http.get<{ content: Event[], totalElements: number }>(`${this.baseUrl}/search/byName`, { params, headers });
   }
 
   searchByLocationPaged(location: string, page: number, size: number): Observable<{ content: Event[], totalElements: number }> {
@@ -43,10 +42,10 @@ export class EventService {
       .set('location', location)
       .set('page', page.toString())
       .set('size', size.toString());
+    const headers = this.getAuthHeaders();
 
-    return this.http.get<{ content: Event[], totalElements: number }>(`${this.baseUrl}/search/byLocation`, { params });
+    return this.http.get<{ content: Event[], totalElements: number }>(`${this.baseUrl}/search/byLocation`, { params, headers });
   }
-
 
   createEvent(event: Event): Observable<Event> {
     const headers = this.getAuthHeaders();
@@ -62,32 +61,25 @@ export class EventService {
     const headers = this.getAuthHeaders();
     return this.http.delete<void>(`${this.baseUrl}/delete/${id}`, { headers });
   }
-/*
-  getAllEvents(): Observable<Event[]> {
-    const headers = this.getAuthHeaders(); // se serve autorizzazione
-    return this.http.get<Event[]>(`${this.baseUrl}/all`, { headers });
-  }
-*/
 
   getAllEvents(): Observable<Event[]> {
     const headers = this.getAuthHeaders();
-    return this.http.get<Event[]>(this.baseUrl, { headers });
+    return this.http.get<Event[]>(`${this.baseUrl}/all`, { headers });
   }
+
 
   getEventById(id: number): Observable<Event> {
     const headers = this.getAuthHeaders();
     return this.http.get<Event>(`${this.baseUrl}/${id}`, { headers });
   }
 
-
   getEvents(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.baseUrl}`);
+    const headers = this.getAuthHeaders();
+    return this.http.get<any[]>(`${this.baseUrl}`, { headers });
   }
 
   getEventsByIds(ids: number[], token: string): Observable<Event[]> {
     const headers = new HttpHeaders().set('Authorization', token);
     return this.http.post<Event[]>(`${this.baseUrl}/byIds`, ids, { headers });
   }
-
-
 }

@@ -37,6 +37,7 @@ export const routes: Routes = [
         loadComponent: () =>
           import('./feature/events/event-form/event-form.component').then(m => m.EventFormComponent)
       },
+      { path: ':id/review', loadComponent: () => import('./feature/reviews/review-list/review-list.component').then(m => m.ReviewListComponent) },
       {
         path: ':id',
         loadComponent: () =>
@@ -108,16 +109,19 @@ export const routes: Routes = [
     ]
   },
 
-  { path: 'favorites/public/:token', component: DetailComponent }
+  { path: 'favorites/public/:token', component: DetailComponent },
 
 
 
 
 
+  /*
   {
     path: 'profile',
     loadComponent: () => import('./feature/profile/profile.component').then(m => m.ProfileComponent)
   },
+
+   */
 
 
 

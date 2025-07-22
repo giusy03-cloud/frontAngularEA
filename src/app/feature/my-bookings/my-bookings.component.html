@@ -18,6 +18,6 @@
     <button *ngIf="isEventPast(booking.eventId)" (click)="goToReview(booking.eventId)">
       Recensisci evento
     </button>
-    <button (click)="deleteBooking(booking.eventId)">Cancella</button>
+    <button (click)="deleteBooking(booking.id)">Cancella</button>
   </li>
 </ul>

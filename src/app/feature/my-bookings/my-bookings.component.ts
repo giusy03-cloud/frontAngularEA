@@ -99,7 +99,13 @@ export class MyBookingsComponent implements OnInit {
     });
   }
 
-  deleteBooking(id: number): void {
+
+  deleteBooking(id?: number): void {
+    if (id === undefined) {
+      console.error('ID prenotazione non definito');
+      return;
+    }
+
     if (confirm('Sei sicuro di voler eliminare questa prenotazione?')) {
       const bookingDeleted = this.bookings.find(b => b.id === id);
 
