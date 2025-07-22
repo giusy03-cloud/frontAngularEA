@@ -112,16 +112,12 @@ export const routes: Routes = [
   { path: 'favorites/public/:token', component: DetailComponent },
 
 
-
-
-
-  /*
   {
     path: 'profile',
     loadComponent: () => import('./feature/profile/profile.component').then(m => m.ProfileComponent)
   },
 
-   */
+
 
 
 
