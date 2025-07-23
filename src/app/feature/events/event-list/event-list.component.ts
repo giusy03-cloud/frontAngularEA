@@ -129,6 +129,7 @@ export class EventListComponent implements OnInit {
     }
   }
 
+
   searchByName(): void {
     if (!this.searchName.trim()) {
       this.currentSearchType = 'NONE';
@@ -139,8 +140,32 @@ export class EventListComponent implements OnInit {
     this.currentSearchType = 'NAME';
     this.page = 0;
     this.events = [];
-    this.loadEvents(true);
+    this.isLoading = true;
+
+    this.eventsService.searchByNamePaged(this.searchName, this.page, this.size).subscribe({
+      next: (response) => {
+        this.events = response.content;
+        this.totalElements = response.totalElements;
+
+        this.events.forEach(event => {
+          this.bookingService.getBookingCount(event.id!).subscribe({
+            next: count => event.bookedCount = count,
+            error: err => {
+              console.error(`Errore caricamento conteggio prenotazioni evento ${event.id}`, err);
+              event.bookedCount = 0;
+            }
+          });
+        });
+
+        this.isLoading = false;
+      },
+      error: err => {
+        console.error('Errore nella ricerca per nome:', err);
+        this.isLoading = false;
+      }
+    });
   }
+
 
   searchByLocation(): void {
     if (!this.searchLocation.trim()) {
@@ -152,8 +177,32 @@ export class EventListComponent implements OnInit {
     this.currentSearchType = 'LOCATION';
     this.page = 0;
     this.events = [];
-    this.loadEvents(true);
+    this.isLoading = true;
+
+    this.eventsService.searchByLocationPaged(this.searchLocation, this.page, this.size).subscribe({
+      next: (response) => {
+        this.events = response.content;
+        this.totalElements = response.totalElements;
+
+        this.events.forEach(event => {
+          this.bookingService.getBookingCount(event.id!).subscribe({
+            next: count => event.bookedCount = count,
+            error: err => {
+              console.error(`Errore caricamento conteggio prenotazioni evento ${event.id}`, err);
+              event.bookedCount = 0;
+            }
+          });
+        });
+
+        this.isLoading = false;
+      },
+      error: err => {
+        console.error('Errore nella ricerca per location:', err);
+        this.isLoading = false;
+      }
+    });
   }
+
 
   deleteEvent(id: number): void {
     if (confirm('Sei sicuro di voler eliminare questo evento?')) {
@@ -248,44 +297,63 @@ export class EventListComponent implements OnInit {
   }
 
 
-
-  toggleFavorite(event: Event): void {
+  toggleFavorite(event: any): void {
     const userId = this.authService.getUserId();
     const token = this.authService.getToken();
 
     if (!userId || !token) {
-      alert('Devi essere loggato per usare i preferiti.');
+      alert('Devi essere loggato per modificare i preferiti.');
       return;
     }
 
-    if (this.favoriteEventIds.has(event.id!)) {
-      this.favoriteEventIds.delete(event.id!);
-      this.favoriteService.removeFromFavorites(userId, event.id!, `Bearer ${token}`).subscribe({
+    const isFav = this.favoriteEventIds.has(event.id);
+
+    if (isFav) {
+      this.favoriteService.removeFromFavorites(userId, event.id, token).subscribe({
         next: () => {
-          console.log(`Evento ${event.id} rimosso dai preferiti.`);
-          // Rimuovi evento anche dalla lista eventi visualizzati, se stai mostrando solo preferiti
+          console.log(`Evento ${event.id} rimosso dai preferiti con successo.`);
+          this.favoriteEventIds.delete(event.id);
+
           if (this.isShowingFavorites) {
+            // Rimuovi evento localmente dalla lista (se stai mostrando solo preferiti)
             this.events = this.events.filter(e => e.id !== event.id);
-            this.totalElements--;
           }
         },
-        error: (err:any) => console.error('Errore rimozione preferito:', err)
+        error: (err) => {
+          console.error('Errore rimozione preferito:', err);
+        }
       });
     } else {
-      this.favoriteEventIds.add(event.id!);
-      this.favoriteService.addToFavorites(userId, event.id!, `Bearer ${token}`).subscribe({
-        next: () => console.log(`Evento ${event.id} aggiunto ai preferiti.`),
-        error: (err:any) => console.error('Errore aggiunta preferito:', err)
+      this.favoriteService.addToFavorites(userId, event.id, token).subscribe({
+        next: () => {
+          console.log(`Evento ${event.id} aggiunto ai preferiti con successo.`);
+          this.favoriteEventIds.add(event.id);
+
+          if (this.isShowingFavorites) {
+            // Puoi aggiungere localmente oppure ricaricare da backend
+            this.loadFavoriteEvents();
+          }
+        },
+        error: (err) => {
+          console.error('Errore aggiunta preferito:', err);
+        }
       });
     }
+
   }
+
+
+
+
 
 
   isFavorite(event: Event): boolean {
     return this.favoriteEventIds.has(event.id!);
   }
 
+
   loadFavoriteEvents(): void {
+    console.log('Caricamento preferiti iniziato...');
     const userId = this.authService.getUserId();
     const token = this.authService.getToken();
 
@@ -297,32 +365,51 @@ export class EventListComponent implements OnInit {
     this.isShowingFavorites = true;
     this.isLoading = true;
 
+
     this.favoriteService.getFavorites(userId, `Bearer ${token}`).subscribe({
       next: (favoriteIds: number[]) => {
+        console.log('ID preferiti ricevuti:', favoriteIds);
+
+        // Aggiorna il Set dei preferiti con i dati freschi
+        this.favoriteEventIds = new Set(favoriteIds);
+
         if (favoriteIds.length === 0) {
           this.events = [];
           this.isLoading = false;
+          console.log('Nessun preferito trovato, lista eventi vuota.');
           return;
         }
-
-        // Usa EventService per caricare gli eventi dati gli ID
 
         this.eventsService.getEventsByIds(favoriteIds, `Bearer ${token}`).subscribe({
           next: (events) => {
             this.events = events;
             this.isLoading = false;
+            console.log('Eventi preferiti caricati:', events);
           },
           error: (err) => {
             console.error('Errore caricamento eventi preferiti:', err);
             this.isLoading = false;
           }
         });
-
       },
       error: (err) => {
         console.error('Errore caricamento preferiti:', err);
         this.isLoading = false;
       }
     });
+
+
+
   }
+
+  showFavorites(): void {
+    this.loadFavoriteEvents();
+  }
+
+  showAllEvents(): void {
+    this.isShowingFavorites = false;
+    this.loadEvents(true);
+  }
+
+
 }

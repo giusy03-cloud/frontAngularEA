@@ -16,6 +16,17 @@
     <button (click)="searchByLocation()">Cerca</button>
   </div>
 
+  <!-- Pulsanti filtro preferiti -->
+  <div style="margin-bottom: 1rem;">
+    <button (click)="showAllEvents()" [disabled]="!isShowingFavorites">Mostra Tutti</button>
+    <button (click)="showFavorites()" [disabled]="isShowingFavorites">Mostra Preferiti</button>
+  </div>
+
+  <!-- Messaggio quando si stanno vedendo solo i preferiti -->
+  <div *ngIf="isShowingFavorites" style="margin-bottom: 1rem; font-weight: bold;">
+    Stai visualizzando solo gli eventi preferiti
+  </div>
+
   <!-- Tabella eventi -->
   <table *ngIf="events && events.length > 0" class="event-table">
     <thead>
@@ -54,10 +65,10 @@
         <ng-template #participantButtons>
           <button
             [disabled]="
-        event.status === 'CANCELLED' ||
-        event.status === 'INACTIVE' ||
-        ((event.capacity ?? 0) - (event.bookedCount || 0)) <= 0
-      "
+              event.status === 'CANCELLED' ||
+              event.status === 'INACTIVE' ||
+              ((event.capacity ?? 0) - (event.bookedCount || 0)) <= 0
+            "
             (click)="bookEvent(event.id!)"
           >
             Prenota
@@ -94,7 +105,8 @@
       events &&
       events.length > 0 &&
       totalElements !== undefined &&
-      (page + 1) * size < totalElements
+      (page + 1) * size < totalElements &&
+      !isShowingFavorites
     "
   >
     <button (click)="loadMore()" [disabled]="isLoading">Carica altri eventi</button>

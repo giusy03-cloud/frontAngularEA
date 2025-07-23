@@ -63,6 +63,7 @@ export class ListComponent implements OnInit {
   }
 
 
+
   removeFavorite(eventId: number): void {
     const userId = this.authService.getUserId();
     const token = this.authService.getToken();
@@ -72,9 +73,8 @@ export class ListComponent implements OnInit {
       return;
     }
 
-    this.favoriteService.removeFromFavorites(userId, eventId, `Bearer ${token}`).subscribe({
+    this.favoriteService.removeFromFavorites(userId, eventId, token).subscribe({
       next: () => {
-        // Aggiorna la lista preferiti localmente
         this.favoriteEvents = this.favoriteEvents.filter(e => e.id !== eventId);
         console.log(`Evento ${eventId} rimosso dai preferiti`);
       },
@@ -83,6 +83,8 @@ export class ListComponent implements OnInit {
       }
     });
   }
+
+
 
 
 
